@@ -9,12 +9,18 @@ namespace TortoiseBot.Core.Board
 {
     public class Board
     {
-        public Piece[,] Square;
+        public PositionInfo currentPosition;
 
-        public Board()
+        public void LoadStartingPosition()
         {
-            Square = new Piece[8,8];
+            LoadPosition(FenUtility.StartFen);
         }
+
+        public void LoadPosition(string fen)
+        {
+            this.currentPosition = FenUtility.FenStringParser(fen);
+        }
+
     }
 }
     

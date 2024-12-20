@@ -7,10 +7,32 @@ using TortoiseBot.Core.Board;
 
 namespace TortoiseBot.Core.Utility
 {
+
     public class FenUtility
     {
-        
-        static Dictionary<char, Piece> pieceTypeFromSymbol = new Dictionary<char, Piece>()
+        public const string StartFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+
+        public static PositionInfo FenStringParser(string fen)
+        {
+            PositionInfo loadedPositionInfo = new PositionInfo(fen);
+            return loadedPositionInfo;
+        } 
+    }
+
+    public readonly struct PositionInfo
+    {
+        public readonly string fen;
+        public readonly Piece[] squares;
+        public readonly bool whiteToMove;
+        public readonly bool whiteKingCastle;
+        public readonly bool whiteQueenCastle;
+        public readonly bool blackKingCastle;
+        public readonly bool blackQueenCastle;
+        public readonly int epTargetSquare;
+        public readonly int halfmoveClock;
+        public readonly int fullmoveClock;
+
+        private static Dictionary<char, Piece> pieceTypeFromSymbol = new Dictionary<char, Piece>()
         {
             ['k'] = Piece.King,
             ['p'] = Piece.Pawn,
@@ -20,12 +42,12 @@ namespace TortoiseBot.Core.Utility
             ['q'] = Piece.Queen
         };
 
-        public static PositionInfo FenStringParser(string fenString)
+        public PositionInfo(string fen)
         {
-            PositionInfo loadedPositionInfo = new PositionInfo();
+            this.fen = fen;
+            squares = new Piece[64];
 
-            string[] sections = fenString.Split(" ");
-
+            string[] sections = fen.Split(" ");
 
             //Parse position
             string[] ranks = sections[0].Split("/");
@@ -43,53 +65,32 @@ namespace TortoiseBot.Core.Utility
                     {
                         Piece pieceColor = (char.IsUpper(c)) ? Piece.White : Piece.Black;
                         Piece pieceType = pieceTypeFromSymbol[char.ToLower(c)];
-                        loadedPositionInfo.squares[row, file] = pieceColor | pieceType;
+                        squares[row * 8 + file] = pieceColor | pieceType;
                         file += 1;
                     }
                 }
             }
 
             //Side to move
-            loadedPositionInfo.whiteToMove = (sections[1] == "w");
+            whiteToMove = (sections[1] == "w");
 
             //Castling rights
-            loadedPositionInfo.whiteKingCastle = sections[2].Contains("K");
-            loadedPositionInfo.whiteQueenCastle = sections[2].Contains("Q");
-            loadedPositionInfo.blackKingCastle = sections[2].Contains("k");
-            loadedPositionInfo.blackQueenCastle = sections[2].Contains("q");
+            whiteKingCastle = sections[2].Contains("K");
+            whiteQueenCastle = sections[2].Contains("Q");
+            blackKingCastle = sections[2].Contains("k");
+            blackQueenCastle = sections[2].Contains("q");
 
             //En Passant
+            if (sections[3] != "-")
+            {
+                epTargetSquare = BoardUtility.GetSquareIndex(sections[3].ToString());
+            }
 
-            
             //Half move counter
-
+            halfmoveClock = int.Parse(sections[4]);
 
             //Full move counter
-
-
-
-            return loadedPositionInfo;
-
-        }
-
-        
-    }
-
-    public class PositionInfo
-    {
-        public Piece[,] squares;
-        public bool whiteToMove;
-        public bool whiteKingCastle;
-        public bool whiteQueenCastle;
-        public bool blackKingCastle;
-        public bool blackQueenCastle;
-        public int epFile;
-        public int halfmoveClock;
-        public int fullmoveClock;
-
-        public PositionInfo()
-        {
-            squares = new Piece[8,8];
+            fullmoveClock = int.Parse(sections[5]);
         }
     }
 }
