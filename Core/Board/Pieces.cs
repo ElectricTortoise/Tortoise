@@ -6,37 +6,23 @@ using System.Threading.Tasks;
 
 namespace TortoiseBot.Core.Board
 {
-    [Flags]
-    public enum Piece
-    {
-        None = 0,
-        Pawn = 1,
-        Rook = 2,
-        Knight = 4,
-        Bishop = 8,
-        Queen = 16,
-        King = 32,
-        White = 64,
-        Black = 128
-    }
-
     public class Pieces
     {
-        //White pieces
-        public const Piece WhitePawn = Piece.Pawn | Piece.White;
-        public const Piece WhiteRook = Piece.Rook | Piece.White;
-        public const Piece WhiteKnight = Piece.Knight | Piece.White;
-        public const Piece WhiteBishop = Piece.Bishop | Piece.White;
-        public const Piece WhiteQueen = Piece.Queen | Piece.White;
-        public const Piece WhiteKing = Piece.King | Piece.White;
+        public static int? GetPieceColour(int piece)
+        {
+            if (piece == 0)
+            {
+                return null;
+            }
+            else
+            {
+                return piece & 1; // Black = 0, White = 1
+            }
+        }
 
-        //Black pieces
-        public const Piece BlackPawn = Piece.Pawn | Piece.Black;
-        public const Piece BlackRook = Piece.Rook | Piece.Black;
-        public const Piece BlackKnight = Piece.Knight | Piece.Black;
-        public const Piece BlackBishop = Piece.Bishop | Piece.Black;
-        public const Piece BlackQueen = Piece.Queen | Piece.Black;
-        public const Piece BlackKing = Piece.King | Piece.Black;
-
+        public static int GetPieceType(int piece)
+        {
+            return piece >> 1; // P=0, R=1, N=2, B=3, Q=4, K=5
+        }
     }
 }

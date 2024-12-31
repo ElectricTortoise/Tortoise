@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TortoiseBot.Core.Board;
+using TortoiseBot.Core.MoveGeneration;
 
 namespace TortoiseBot.Core.Utility
 {
@@ -22,7 +22,6 @@ namespace TortoiseBot.Core.Utility
     public readonly struct PositionInfo
     {
         public readonly string fen;
-        public readonly Piece[] squares;
         public readonly bool whiteToMove;
         public readonly bool whiteKingCastle;
         public readonly bool whiteQueenCastle;
@@ -31,21 +30,23 @@ namespace TortoiseBot.Core.Utility
         public readonly int epTargetSquare;
         public readonly int halfmoveClock;
         public readonly int fullmoveClock;
+        public readonly Bitboard bitboard;
 
-        private static Dictionary<char, Piece> pieceTypeFromSymbol = new Dictionary<char, Piece>()
+
+        private static Dictionary<char, int> pieceTypeFromSymbol = new Dictionary<char, int>()
         {
-            ['k'] = Piece.King,
-            ['p'] = Piece.Pawn,
-            ['n'] = Piece.Knight,
-            ['b'] = Piece.Bishop,
-            ['r'] = Piece.Rook,
-            ['q'] = Piece.Queen
+            ['k'] = PieceType.King,
+            ['p'] = PieceType.Pawn,
+            ['n'] = PieceType.Knight,
+            ['b'] = PieceType.Bishop,
+            ['r'] = PieceType.Rook,
+            ['q'] = PieceType.Queen
         };
 
         public PositionInfo(string fen)
         {
             this.fen = fen;
-            squares = new Piece[64];
+            bitboard = new Bitboard();
 
             string[] sections = fen.Split(" ");
 
@@ -62,10 +63,10 @@ namespace TortoiseBot.Core.Utility
                         file += (int)char.GetNumericValue(c);
                     }
                     else
-                    {
-                        Piece pieceColor = (char.IsUpper(c)) ? Piece.White : Piece.Black;
-                        Piece pieceType = pieceTypeFromSymbol[char.ToLower(c)];
-                        squares[row * 8 + file] = pieceColor | pieceType;
+                    { 
+                        int pieceType = pieceTypeFromSymbol[char.ToLower(c)];
+                        int pieceColour = (char.IsUpper(c)) ? Colour.White : Colour.Black;
+                        bitboard.AddPiece(pieceType, pieceColour, row * 8 + file);
                         file += 1;
                     }
                 }

@@ -3,25 +3,49 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TortoiseBot.Core.Utility;
 
 namespace TortoiseBot.Core.MoveGeneration
 {
     public class Bitboard
     {
-        //White pieces bitboards
-        public ulong wPawnBB;
-        public ulong wRookBB;
-        public ulong wKnightBB;
-        public ulong wBishopBB;
-        public ulong wQueenBB;
-        public ulong wKingBB;
+        public ulong[] pieceBitboard;
+        public ulong[] colourBitboard;
+        public ulong allPieceBitboard;
 
-        //Black pieces bitboards
-        public ulong bPawnBB;
-        public ulong wRookBB;
-        public ulong wKnightBB;
-        public ulong wBishopBB;
-        public ulong wQueenBB;
-        public ulong wKingBB;
+        public Bitboard() 
+        { 
+            pieceBitboard = new ulong[6];
+            colourBitboard = new ulong[2];
+            allPieceBitboard = 0UL;
+        }
+
+        public void AddPiece(int pieceType, int pieceColour, int index)
+        {
+            if (!BoardUtility.IsBitOnBitboard(allPieceBitboard, index))
+            {
+                allPieceBitboard |= (1UL << index);
+                pieceBitboard[pieceType] |= (1UL << index);
+                colourBitboard[pieceColour] |= (1UL << index);
+            }
+            else
+            {
+                throw new CustomException("Tried to add piece to occupied square");
+            }
+        }
+
+        public void RemovePiece(int pieceType, int pieceColour, int index)
+        {
+            if (BoardUtility.IsBitOnBitboard(colourBitboard[pieceColour], index) & BoardUtility.IsBitOnBitboard(pieceBitboard[pieceType], index))
+                {
+                    allPieceBitboard &= ~(1UL << index);
+                    pieceBitboard[pieceType] &= ~(1UL << index);
+                    colourBitboard[pieceColour] &= ~(1UL << index);
+                }
+            else
+            {
+                throw new CustomException("No piece to remove or tried to remove wrong piece");
+            }
+        }
     }
 }
