@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -17,6 +18,21 @@ namespace TortoiseBot.Core.Utility
         public static bool IsBitOnBitboard(ulong bitboard, int index)
         {
             return (bitboard & (1UL << index)) != 0;
+        }
+
+        public static int[] GetBitIndices(ulong value)
+        {
+            Span<int> indices = stackalloc int[64];
+            int count = 0;
+
+            while (value != 0)
+            {
+                int index = BitOperations.TrailingZeroCount(value);
+                indices[count++] = index;
+                value &= value - 1;
+            }
+
+            return indices.Slice(0, count).ToArray();
         }
     }
 }

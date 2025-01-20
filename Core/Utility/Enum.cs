@@ -23,4 +23,5 @@ namespace TortoiseBot.Core.Utility
         public const byte Black = 0;
         public const byte White = 1;
     }
+
 }
