@@ -206,7 +206,7 @@ namespace TortoiseBot.Core.MoveGeneration
             }
         }
 
-        private static ulong GetSquareMoves(ulong allPieceBitboard, int square, bool isRook)
+        public static ulong GetSquareMoves(ulong allPieceBitboard, int square, bool isRook)
         {
             int pieceType = isRook ? PieceType.Rook : PieceType.Bishop;
             ulong precomputedBitboard = isRook ? PrecomputedData.OrthogonalMask[square] : PrecomputedData.DiagonalMask[square];

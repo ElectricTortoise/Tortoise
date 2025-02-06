@@ -58,67 +58,22 @@ namespace TortoiseBot.Core.Utility
 
         public static bool IsInCheck(Board.Board board, int kingSquare)
         {
-            ulong myColourBitboard = board.colourBitboard[board.boardState.GetColourToMove()];
             ulong opponentColourBitboard = board.colourBitboard[board.boardState.GetOpponentColour()];
-            ulong value = opponentColourBitboard;
             ulong allPieceBitboard = board.allPieceBitboard;
 
-            while (value != 0)
-            {
-                int square = BitOperations.TrailingZeroCount(value);
 
-                int pieceType = board.pieceTypesBitboard[square];
-                switch (pieceType)
-                {
-                    case PieceType.Knight:
-                        if ((PrecomputedData.KnightMask[kingSquare] & (1UL << square)) != 0)
-                        {
-                            return true;
-                        }
-                        break;
-                    case PieceType.King:
-                        if ((PrecomputedData.KingMask[kingSquare] & (1UL << square)) != 0)
-                        {
-                            return true;
-                        }
-                        break;
-                    case PieceType.Pawn:
-                        ulong pawnMask = board.boardState.whiteToMove ? PrecomputedData.WhitePawnCaptureMask[kingSquare] : PrecomputedData.BlackPawnCaptureMask[kingSquare];
-                        if ((pawnMask & (1UL << square)) != 0)
-                        {
-                            return true;
-                        }
-                        break;
-                    case PieceType.Rook:
-                        ulong rookBlocker = PrecomputedData.OrthogonalMask[kingSquare] & allPieceBitboard;
-                        ulong rookMask = GenerateSliderAttackMask(kingSquare, rookBlocker, true);
-                        if ((rookMask & (1UL << square)) != 0)
-                        {
-                            return true;
-                        }
-                        break;
-                    case PieceType.Bishop:
-                        ulong bishopBlocker = PrecomputedData.DiagonalMask[kingSquare] & allPieceBitboard;
-                        ulong bishopMask = GenerateSliderAttackMask(kingSquare, bishopBlocker, false);
-                        if ((bishopMask & (1UL << square)) != 0)
-                        {
-                            return true;
-                        }
-                        break;
-                    case PieceType.Queen:
-                        rookBlocker = PrecomputedData.OrthogonalMask[kingSquare] & allPieceBitboard;
-                        rookMask = GenerateSliderAttackMask(kingSquare, rookBlocker, true);
-                        bishopBlocker = PrecomputedData.DiagonalMask[kingSquare] & allPieceBitboard;
-                        bishopMask = GenerateSliderAttackMask(kingSquare, bishopBlocker, false);
-                        ulong queenMask = rookMask | bishopMask;
-                        if ((queenMask & (1UL << square)) != 0)
-                        {
-                            return true;
-                        }
-                        break;
-                }
-                value &= value - 1;
-            }
+            if ((PrecomputedData.KnightMask[kingSquare] & opponentColourBitboard & board.pieceBitboard[PieceType.Knight]) != 0) { return true; };
+            if ((PrecomputedData.KingMask[kingSquare] & opponentColourBitboard & board.pieceBitboard[PieceType.King]) != 0) { return true; };
+
+            //Only get the pawn mask if Knight and King doesn't return
+            ulong pawnMask = board.boardState.whiteToMove ? PrecomputedData.WhitePawnCaptureMask[kingSquare] : PrecomputedData.BlackPawnCaptureMask[kingSquare];
+            if ((pawnMask & opponentColourBitboard & board.pieceBitboard[PieceType.Pawn]) != 0) { return true; };
+
+            //Only get the rook/bishop mask if Pawn doesn't return
+            ulong rookMask = MoveGen.GetSquareMoves(allPieceBitboard, kingSquare, true);
+            ulong bishopMask = MoveGen.GetSquareMoves(allPieceBitboard, kingSquare, false);
+            if ((rookMask & opponentColourBitboard & (board.pieceBitboard[PieceType.Rook] | board.pieceBitboard[PieceType.Queen])) != 0) { return true; };
+            if ((bishopMask & opponentColourBitboard & (board.pieceBitboard[PieceType.Bishop] | board.pieceBitboard[PieceType.Queen])) != 0) { return true; };
 
             return false;
         }
