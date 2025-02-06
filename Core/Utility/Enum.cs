@@ -11,9 +11,9 @@ namespace TortoiseBot.Core.Utility
     public static class PieceType
     {
         public const byte Pawn = 0;
-        public const byte Rook = 1;
-        public const byte Knight = 2;
-        public const byte Bishop = 3;
+        public const byte Knight = 1;
+        public const byte Bishop = 2;
+        public const byte Rook = 3;
         public const byte Queen = 4;
         public const byte King = 5;
     }

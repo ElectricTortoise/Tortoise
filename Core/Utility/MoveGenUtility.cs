@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using TortoiseBot.Core.Board;
+using TortoiseBot.Core.MoveGeneration;
 
 namespace TortoiseBot.Core.Utility
 {
@@ -20,7 +23,6 @@ namespace TortoiseBot.Core.Utility
 
             return Math.Max(rankDistance, fileDistance) <= 1;
         }
-    
 
         public static ulong GenerateSliderAttackMask(int square, ulong blocker, bool isRook)
         {
@@ -52,6 +54,73 @@ namespace TortoiseBot.Core.Utility
                 }
             }
             return attacks;
+        }
+
+        public static bool IsInCheck(Board.Board board, int kingSquare)
+        {
+            ulong myColourBitboard = board.colourBitboard[board.boardState.GetColourToMove()];
+            ulong opponentColourBitboard = board.colourBitboard[board.boardState.GetOpponentColour()];
+            ulong value = opponentColourBitboard;
+            ulong allPieceBitboard = board.allPieceBitboard;
+
+            while (value != 0)
+            {
+                int square = BitOperations.TrailingZeroCount(value);
+
+                int pieceType = board.pieceTypesBitboard[square];
+                switch (pieceType)
+                {
+                    case PieceType.Knight:
+                        if ((PrecomputedData.KnightMask[kingSquare] & (1UL << square)) != 0)
+                        {
+                            return true;
+                        }
+                        break;
+                    case PieceType.King:
+                        if ((PrecomputedData.KingMask[kingSquare] & (1UL << square)) != 0)
+                        {
+                            return true;
+                        }
+                        break;
+                    case PieceType.Pawn:
+                        ulong pawnMask = board.boardState.whiteToMove ? PrecomputedData.WhitePawnCaptureMask[kingSquare] : PrecomputedData.BlackPawnCaptureMask[kingSquare];
+                        if ((pawnMask & (1UL << square)) != 0)
+                        {
+                            return true;
+                        }
+                        break;
+                    case PieceType.Rook:
+                        ulong rookBlocker = PrecomputedData.OrthogonalMask[kingSquare] & allPieceBitboard;
+                        ulong rookMask = GenerateSliderAttackMask(kingSquare, rookBlocker, true);
+                        if ((rookMask & (1UL << square)) != 0)
+                        {
+                            return true;
+                        }
+                        break;
+                    case PieceType.Bishop:
+                        ulong bishopBlocker = PrecomputedData.DiagonalMask[kingSquare] & allPieceBitboard;
+                        ulong bishopMask = GenerateSliderAttackMask(kingSquare, bishopBlocker, false);
+                        if ((bishopMask & (1UL << square)) != 0)
+                        {
+                            return true;
+                        }
+                        break;
+                    case PieceType.Queen:
+                        rookBlocker = PrecomputedData.OrthogonalMask[kingSquare] & allPieceBitboard;
+                        rookMask = GenerateSliderAttackMask(kingSquare, rookBlocker, true);
+                        bishopBlocker = PrecomputedData.DiagonalMask[kingSquare] & allPieceBitboard;
+                        bishopMask = GenerateSliderAttackMask(kingSquare, bishopBlocker, false);
+                        ulong queenMask = rookMask | bishopMask;
+                        if ((queenMask & (1UL << square)) != 0)
+                        {
+                            return true;
+                        }
+                        break;
+                }
+                value &= value - 1;
+            }
+
+            return false;
         }
     }
 }

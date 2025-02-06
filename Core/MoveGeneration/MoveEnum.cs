@@ -33,17 +33,18 @@ namespace TortoiseBot.Core.MoveGeneration
         }
     }
 
+
     [Flags]
     public enum MoveFlag : byte
     {
         Default = 0,
         EnPassant = 1,
-        Capture = 2,
-        DoublePush = 4,
-        Castle = 8,
-        PromoteToQueen = 16,
-        PromoteToRook = 32,
-        PromoteToBishop = 64,
-        PromoteToKnight = 128
+        DoublePush = 2,
+        Capture = 4,
+        PromoteToKnight = 8,
+        PromoteToBishop = 9,
+        PromoteToRook = 10,
+        PromoteToQueen = 11,
+        Castle = 16
     }
 }

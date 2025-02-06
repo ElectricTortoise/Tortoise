@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using TortoiseBot.Core.Board;
@@ -12,7 +13,7 @@ namespace TortoiseBot.Core.Utility
     {
         public const string StartFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
-        public static void ParseFenString(Bitboard bitboard, string fen)
+        public static void ParseFenString(ref Board.Board board, string fen)
         {
             string[] sections = fen.Split(" ");
 
@@ -41,32 +42,36 @@ namespace TortoiseBot.Core.Utility
                             _ => -1
                         };
                         int pieceColour = (char.IsUpper(c)) ? Colour.White : Colour.Black;
-                        bitboard.AddPiece(pieceType, pieceColour, row * 8 + file);
+                        board.AddPiece(pieceType, pieceColour, row * 8 + file);
                         file += 1;
                     }
                 }
             }
 
             //Side to move
-            bitboard.boardState.whiteToMove = (sections[1] == "w");
+            board.boardState.whiteToMove = (sections[1] == "w");
 
             //Castling rights
-            bitboard.boardState.whiteKingCastle = sections[2].Contains("K");
-            bitboard.boardState.whiteQueenCastle = sections[2].Contains("Q");
-            bitboard.boardState.blackKingCastle = sections[2].Contains("k");
-            bitboard.boardState.blackQueenCastle = sections[2].Contains("q");
+            board.boardState.whiteKingCastle = sections[2].Contains("K");
+            board.boardState.whiteQueenCastle = sections[2].Contains("Q");
+            board.boardState.blackKingCastle = sections[2].Contains("k");
+            board.boardState.blackQueenCastle = sections[2].Contains("q");
 
             //En Passant
             if (sections[3] != "-")
             {
-                bitboard.boardState.epTargetSquare = BoardUtility.GetSquareIndex(sections[3].ToString());
+                board.boardState.epTargetSquare = BoardUtility.GetSquareIndex(sections[3].ToString());
             }
 
             //Half move counter
-            bitboard.boardState.halfmoveClock = int.Parse(sections[4]);
+            board.boardState.halfmoveClock = int.Parse(sections[4]);
 
             //Full move counter
-            bitboard.boardState.fullmoveClock = int.Parse(sections[5]);
+            board.boardState.fullmoveClock = int.Parse(sections[5]);
+
+            //King Square
+            board.kingSquares[Colour.Black] = BitOperations.TrailingZeroCount(board.pieceBitboard[PieceType.King] & board.colourBitboard[Colour.Black]);
+            board.kingSquares[Colour.White] = BitOperations.TrailingZeroCount(board.pieceBitboard[PieceType.King] & board.colourBitboard[Colour.White]);
         }
     }
 }
