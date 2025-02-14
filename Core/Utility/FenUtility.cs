@@ -9,7 +9,7 @@ using TortoiseBot.Core.Board;
 namespace TortoiseBot.Core.Utility
 {
 
-    public class FenUtility
+    public unsafe class FenUtility
     {
         public const string StartFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 

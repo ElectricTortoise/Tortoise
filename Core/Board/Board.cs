@@ -3,24 +3,20 @@ using TortoiseBot.Core.Utility;
 
 namespace TortoiseBot.Core.Board
 {
-    public struct Board
+
+    public unsafe struct Board
     {
-        public ulong[] pieceBitboard;
-        public ulong[] colourBitboard;
-        public int[] pieceTypesBitboard;
-        public int[] kingSquares;
+        public fixed ulong pieceBitboard[6];
+        public fixed ulong colourBitboard[2];
+        public fixed int pieceTypesBitboard[64];
+        public fixed int kingSquares[2];
         public ulong allPieceBitboard;
         public BoardState boardState;
 
         public Board()
         {
-            pieceBitboard = new ulong[6];
-            colourBitboard = new ulong[2];
-            pieceTypesBitboard = new int[64];
-            kingSquares = new int[2];
-            Array.Fill(pieceTypesBitboard, -1);
+            for (int i = 0; i < 64; i++) {pieceTypesBitboard[i] = -1;}
             allPieceBitboard = 0UL;
-            
 
             boardState = new BoardState();
         }
@@ -171,18 +167,6 @@ namespace TortoiseBot.Core.Board
         public void LoadPosition(string fen)
         {
             FenUtility.ParseFenString(ref this, fen);
-        }
-
-        //returns deep copy
-        public Board Clone()
-        {
-            Board newBoard = this;
-            newBoard.pieceBitboard = this.pieceBitboard.ToArray();
-            newBoard.colourBitboard = this.colourBitboard.ToArray();
-            newBoard.pieceTypesBitboard = this.pieceTypesBitboard.ToArray();
-            newBoard.kingSquares = this.kingSquares.ToArray();
-            newBoard.boardState = this.boardState.Clone();
-            return newBoard;
         }
     }
 }

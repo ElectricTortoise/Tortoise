@@ -8,9 +8,8 @@ using TortoiseBot.Core.Utility;
 
 namespace TortoiseBot.Core.MoveGeneration
 {
-    public class MagicGen
+    public unsafe class MagicGen
     {
-
         public MagicGen()
         {
             ulong[] RookMagics = GenerateMagics(true);
@@ -25,7 +24,7 @@ namespace TortoiseBot.Core.MoveGeneration
                 Console.Write("0x" + Convert.ToString((long)bishopMagic, 16) + ", ");
         }
 
-        public static List<ulong> GenerateBlockers(int square, bool isRook)
+        private static List<ulong> GenerateBlockers(int square, bool isRook)
         {
             ulong bitboard = isRook ? PrecomputedData.OrthogonalMask[square] : PrecomputedData.DiagonalMask[square];
 
@@ -50,7 +49,7 @@ namespace TortoiseBot.Core.MoveGeneration
             for (int i = 0; i < blockerArray.Count; i++)
             {
                 ulong blockerArrangement = blockerArray[i];
-                attackMasks.Add(MoveGenUtility.GenerateSliderAttackMask(square, blockerArrangement, isRook));
+                attackMasks.Add(MoveGenUtility.IterativeGenerateSliderAttackMask(square, blockerArrangement, isRook));
             }
             return attackMasks;
         }

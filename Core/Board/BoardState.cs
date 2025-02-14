@@ -8,7 +8,7 @@ using TortoiseBot.Core.Utility;
 
 namespace TortoiseBot.Core.Board
 {
-    public class BoardState
+    public struct BoardState
     {
         public bool whiteToMove;
         public bool whiteKingCastle;
@@ -19,11 +19,6 @@ namespace TortoiseBot.Core.Board
         public int halfmoveClock;
         public int fullmoveClock;
 
-
-        public BoardState Clone() 
-        { 
-            return (BoardState)MemberwiseClone();
-        }
 
         public byte GetColourToMove()
         {

@@ -6,30 +6,46 @@ using System.Threading.Tasks;
 
 namespace TortoiseBot.Core.MoveGeneration
 {
-    public struct Move
+    public readonly struct Move
     {
-        public int StartSquare;
-        public int FinalSquare;
-        public MoveFlag flag;
+        public readonly byte StartSquare;
+        public readonly byte FinalSquare;
+        public readonly MoveFlag flag;
 
-        public Move(int startSquare, int finalSquare, MoveFlag moveFlag)
+        public Move(byte startSquare, byte finalSquare, MoveFlag moveFlag)
         {
             StartSquare = startSquare;
             FinalSquare = finalSquare;
             flag = moveFlag;
         }
+
+        public Move(ushort move)
+        {
+            flag = (MoveFlag)(move >> 12);
+            StartSquare = (byte)((move >> 6) & 0b111111);
+            FinalSquare = (byte)(move & 0b111111);
+        }
+
+        public ushort EncodeMove() 
+        {
+            return (ushort)((ushort)((int)this.flag << 12) | this.StartSquare << 6 | this.FinalSquare);
+        }
     }
 
-    public struct MoveList
+    public unsafe struct MoveList
     {
-        private const int MAX_LENGTH = 256;
-        public Move[] Moves;
+        public fixed ushort Moves[256];
         public int Length;
 
         public MoveList()
         {
-            Moves = new Move[MAX_LENGTH];
             Length = 0;
+        }
+        public void AddMove(int startSquare, int targetSquare, MoveFlag flag)
+        {
+            Move move = new Move((byte)startSquare, (byte)targetSquare, flag);
+            this.Moves[this.Length] = move.EncodeMove();
+            this.Length++;
         }
     }
 
@@ -40,11 +56,11 @@ namespace TortoiseBot.Core.MoveGeneration
         Default = 0,
         EnPassant = 1,
         DoublePush = 2,
+        Castle = 3,
         Capture = 4,
         PromoteToKnight = 8,
         PromoteToBishop = 9,
         PromoteToRook = 10,
-        PromoteToQueen = 11,
-        Castle = 16
+        PromoteToQueen = 11
     }
 }

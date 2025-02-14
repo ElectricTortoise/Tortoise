@@ -9,7 +9,7 @@ using TortoiseBot.Core.Utility;
 
 namespace TortoiseBot.Core.Perft
 {
-    public class Perft
+    public unsafe class Perft
     {
         public int FullPerft(Board.Board board, int depth)
         {
@@ -24,8 +24,8 @@ namespace TortoiseBot.Core.Perft
             MoveGen.GenAllMoves(board, ref moveList);
             for (int i = 0; i < moveList.Length; i++)
             {
-                Move move = moveList.Moves[i];
-                Board.Board tempBoard = board.Clone();
+                Move move = new Move(moveList.Moves[i]);
+                Board.Board tempBoard = board;
                 tempBoard.MakeMove(move);
                 tempBoard.boardState.whiteToMove = !tempBoard.boardState.whiteToMove;
                 int kingSquare = tempBoard.kingSquares[tempBoard.boardState.whiteToMove ? Colour.White : Colour.Black];
@@ -50,8 +50,9 @@ namespace TortoiseBot.Core.Perft
 
             for (int node = 0; node < moveList.Length; node++) 
             {
-                Board.Board tempBoard = board.Clone();
-                tempBoard.MakeMove(moveList.Moves[node]);
+                Board.Board tempBoard = board;
+                Move move = new Move(moveList.Moves[node]);
+                tempBoard.MakeMove(move);
                 tempBoard.boardState.whiteToMove = !tempBoard.boardState.whiteToMove;
                 int kingSquare = tempBoard.kingSquares[tempBoard.boardState.whiteToMove ? Colour.White : Colour.Black];
 
@@ -61,7 +62,6 @@ namespace TortoiseBot.Core.Perft
                 }
 
                 tempBoard.boardState.whiteToMove = !tempBoard.boardState.whiteToMove;
-                Move move = moveList.Moves[node];
                 string startSquare = BoardUtility.GetSquareName(move.StartSquare);
                 string finalSquare = BoardUtility.GetSquareName(move.FinalSquare);
                 int count = FullPerft(tempBoard, depth - 1);

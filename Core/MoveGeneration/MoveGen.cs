@@ -9,7 +9,7 @@ using TortoiseBot.Core.Utility;
 
 namespace TortoiseBot.Core.MoveGeneration
 {
-    public static class MoveGen
+    public static unsafe class MoveGen
     {
         public static readonly ulong[][] RookLookup;
         public static readonly ulong[][] BishopLookup;
@@ -57,7 +57,7 @@ namespace TortoiseBot.Core.MoveGeneration
                     {
                         flag = MoveFlag.Capture;
                     }
-                    AddMove(ref movelist, startSquare, targetSquare, flag);
+                    movelist.AddMove(startSquare, targetSquare, flag);
                 }
             }
         }
@@ -74,9 +74,9 @@ namespace TortoiseBot.Core.MoveGeneration
             {
                 ulong moveBoard = pieceType switch
                 {
-                    PieceType.Queen => GetSquareMoves(allPieceBitboard, startSquare, true) | GetSquareMoves(allPieceBitboard, startSquare, false),
-                    PieceType.Bishop => GetSquareMoves(allPieceBitboard, startSquare, false),
-                    PieceType.Rook => GetSquareMoves(allPieceBitboard, startSquare, true),
+                    PieceType.Queen => MoveGenUtility.GetSliderSquareMoves(allPieceBitboard, startSquare, true) | MoveGenUtility.GetSliderSquareMoves(allPieceBitboard, startSquare, false),
+                    PieceType.Bishop => MoveGenUtility.GetSliderSquareMoves(allPieceBitboard, startSquare, false),
+                    PieceType.Rook => MoveGenUtility.GetSliderSquareMoves(allPieceBitboard, startSquare, true),
                     _ => 0
                 };
 
@@ -90,7 +90,7 @@ namespace TortoiseBot.Core.MoveGeneration
                     {
                         flag = MoveFlag.Capture;
                     }
-                    AddMove(ref movelist, startSquare, targetSquare, flag);
+                    movelist.AddMove(startSquare, targetSquare, flag);
                 }
             }
         }
@@ -110,7 +110,7 @@ namespace TortoiseBot.Core.MoveGeneration
             foreach (int targetSquare in defaultTargetSquareArray)
             {
                 MoveFlag flag = MoveFlag.Default;
-                AddMove(ref movelist, board.boardState.whiteToMove ? (targetSquare + 8) : (targetSquare - 8), targetSquare, flag);
+                movelist.AddMove(board.boardState.whiteToMove ? (targetSquare + 8) : (targetSquare - 8), targetSquare, flag);
             }
 
             //Double Move
@@ -120,7 +120,7 @@ namespace TortoiseBot.Core.MoveGeneration
             foreach (int targetSquare in doubleMoveTargetSquareArray)
             {
                 MoveFlag flag = MoveFlag.DoublePush;
-                AddMove(ref movelist, board.boardState.whiteToMove ? (targetSquare + 16) : (targetSquare - 16), targetSquare, flag);
+                movelist.AddMove(board.boardState.whiteToMove ? (targetSquare + 16) : (targetSquare - 16), targetSquare, flag);
             }
 
             //Captures
@@ -133,7 +133,7 @@ namespace TortoiseBot.Core.MoveGeneration
                 foreach (int targetSquare in captureTargetSquareArray)
                 {
                     MoveFlag flag = MoveFlag.Capture;
-                    AddMove(ref movelist, pawnSquare, targetSquare, flag);
+                    movelist.AddMove(pawnSquare, targetSquare, flag);
                 }
                 captureMask |= individualCaptureMask;
             }
@@ -150,7 +150,7 @@ namespace TortoiseBot.Core.MoveGeneration
                     foreach (int startSquare in startSquares)
                     {
                         MoveFlag flag = MoveFlag.EnPassant | MoveFlag.Capture;
-                        AddMove(ref movelist, startSquare, epTargetSquare, flag);
+                        movelist.AddMove(startSquare, epTargetSquare, flag);
                     }
                     captureMask |= (1UL << board.boardState.epTargetSquare);
                 }
@@ -175,12 +175,12 @@ namespace TortoiseBot.Core.MoveGeneration
                         if (((1UL << targetSquare) & captureMask) != 0)
                         {
                             flag |= MoveFlag.Capture;
-                            AddMove(ref movelist, startSquare, targetSquare, flag);
+                            movelist.AddMove(startSquare, targetSquare, flag);
                             flag ^= MoveFlag.Capture;
                         }
                         else
                         {
-                            AddMove(ref movelist, startSquare, targetSquare, flag);
+                            movelist.AddMove(startSquare, targetSquare, flag);
                         }
                     }
                 }
@@ -197,27 +197,13 @@ namespace TortoiseBot.Core.MoveGeneration
 
             if (kingSide && IsCastlingValid(startSquare, startSquare + 2, board))
             {
-                AddMove(ref movelist, startSquare, startSquare + 2, flag);
+                movelist.AddMove(startSquare, startSquare + 2, flag);
             }
 
             if (queenSide && IsCastlingValid(startSquare, startSquare - 2, board))
             {
-                AddMove(ref movelist, startSquare, startSquare - 2, flag);
+                movelist.AddMove(startSquare, startSquare - 2, flag);
             }
-        }
-
-        public static ulong GetSquareMoves(ulong allPieceBitboard, int square, bool isRook)
-        {
-            int pieceType = isRook ? PieceType.Rook : PieceType.Bishop;
-            ulong precomputedBitboard = isRook ? PrecomputedData.OrthogonalMask[square] : PrecomputedData.DiagonalMask[square];
-            ulong magic = isRook ? MagicGen.RookMagics[square] : MagicGen.BishopMagics[square];
-            int shift = isRook ? MagicGen.RookShifts[square] : MagicGen.BishopShifts[square];
-            ulong[][] lookup = isRook ? RookLookup : BishopLookup;
-
-            ulong blockers = precomputedBitboard & allPieceBitboard;
-            ulong hash = (blockers * magic) >> shift;
-
-            return lookup[square][hash];
         }
 
         private static bool IsCastlingValid(int startSquare, int targetSquare, Board.Board board)
@@ -245,11 +231,6 @@ namespace TortoiseBot.Core.MoveGeneration
             return true;
         }
 
-        private static void AddMove(ref MoveList movelist, int startSquare, int targetSquare, MoveFlag flag)
-        {
-            Move move = new Move(startSquare, targetSquare, flag);
-            movelist.Moves[movelist.Length] = move;
-            movelist.Length++;
-        }
+
     }
 }
