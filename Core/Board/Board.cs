@@ -168,5 +168,10 @@ namespace TortoiseBot.Core.Board
         {
             FenUtility.ParseFenString(ref this, fen);
         }
+
+        public void Clear()
+        {
+            this = new Board();
+        }
     }
 }

@@ -62,12 +62,11 @@ namespace TortoiseBot.Core.Utility
             ulong precomputedBitboard = isRook ? PrecomputedData.OrthogonalMask[square] : PrecomputedData.DiagonalMask[square];
             ulong magic = isRook ? MagicGen.RookMagics[square] : MagicGen.BishopMagics[square];
             int shift = isRook ? MagicGen.RookShifts[square] : MagicGen.BishopShifts[square];
-            ulong[][] lookup = isRook ? MoveGen.RookLookup : MoveGen.BishopLookup;
 
             ulong blockers = precomputedBitboard & allPieceBitboard;
             ulong hash = (blockers * magic) >> shift;
 
-            return lookup[square][hash];
+            return isRook ? MoveGen.RookLookup[square][hash] : MoveGen.BishopLookup[square][hash]; ;
         }
 
         public static bool IsInCheck(Board.Board board, int kingSquare)
