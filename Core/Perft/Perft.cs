@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using TortoiseBot.Core.Board;
@@ -12,6 +13,7 @@ namespace TortoiseBot.Core.Perft
 {
     public unsafe class Perft
     {
+
         public int FullPerft(Board.Board board, int depth)
         {
             int nodes = 0;
@@ -37,7 +39,7 @@ namespace TortoiseBot.Core.Perft
                 }
 
                 tempBoard.boardState.whiteToMove = !tempBoard.boardState.whiteToMove;
-                nodes += FullPerft(tempBoard, depth-1);
+                nodes += FullPerft(tempBoard, depth - 1);
             }
 
             return nodes;

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -20,6 +21,7 @@ namespace TortoiseBot.Core.Utility
             return (((char)(square % 8 + 'a')).ToString() + ((char)('8' - square / 8)).ToString());
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsBitOnBitboard(ulong bitboard, int index)
         {
             return (bitboard & (1UL << index)) != 0;

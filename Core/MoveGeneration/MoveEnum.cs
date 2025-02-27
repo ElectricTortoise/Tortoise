@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -26,6 +27,7 @@ namespace TortoiseBot.Core.MoveGeneration
             FinalSquare = (byte)(move & 0b111111);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ushort EncodeMove() 
         {
             return (ushort)((ushort)((int)this.flag << 12) | this.StartSquare << 6 | this.FinalSquare);
@@ -41,6 +43,8 @@ namespace TortoiseBot.Core.MoveGeneration
         {
             Length = 0;
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void AddMove(int startSquare, int targetSquare, MoveFlag flag)
         {
             Move move = new Move((byte)startSquare, (byte)targetSquare, flag);

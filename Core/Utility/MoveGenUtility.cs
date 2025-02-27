@@ -58,7 +58,6 @@ namespace TortoiseBot.Core.Utility
 
         public static ulong GetSliderSquareMoves(ulong allPieceBitboard, int square, bool isRook)
         {
-            int pieceType = isRook ? PieceType.Rook : PieceType.Bishop;
             ulong precomputedBitboard = isRook ? PrecomputedData.OrthogonalMask[square] : PrecomputedData.DiagonalMask[square];
             ulong magic = isRook ? MagicGen.RookMagics[square] : MagicGen.BishopMagics[square];
             int shift = isRook ? MagicGen.RookShifts[square] : MagicGen.BishopShifts[square];

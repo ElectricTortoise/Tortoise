@@ -1,4 +1,5 @@
-﻿using TortoiseBot.Core.MoveGeneration;
+﻿using System.Runtime.CompilerServices;
+using TortoiseBot.Core.MoveGeneration;
 using TortoiseBot.Core.Utility;
 
 namespace TortoiseBot.Core.Board
