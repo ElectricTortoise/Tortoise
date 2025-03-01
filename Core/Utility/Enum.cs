@@ -6,7 +6,7 @@ using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TortoiseBot.Core.Utility
+namespace TortoiseBot.Core
 {
     public static class PieceType
     {

@@ -4,45 +4,57 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using TortoiseBot.Core.MoveGeneration;
-using TortoiseBot.Core.Utility;
 
-namespace TortoiseBot.Core.Search
+
+namespace TortoiseBot.Core
 {
     public static unsafe class Search
     {
-        public static int NegaMax(Board.Board board, int depth, int alpha, int beta)
+        public static int NegaMax(Board board, int depth, int ply, int alpha, int beta)
         {
             if (depth == 0)
             {
-                return Evaluation.Evaluation.Evaluate(board);
+                return Evaluation.Evaluate(board);
             }
 
-            int bestSoFar = int.MinValue;
+            int bestSoFar = -1000000;
+            int legalMoves = 0;
             MoveList moveList = new MoveList();
             MoveGen.GenAllMoves(board, ref moveList);
 
+            Board tempBoard = board;
             for (int i = 0; i < moveList.Length; i++)
             {
                 Move move = new Move(moveList.Moves[i]);
-                Board.Board tempBoard = board;
-                tempBoard.MakeMove(move);
+                tempBoard = board;
+                tempBoard.MakeMove(move); // flips whose turn it is to move
 
-                tempBoard.boardState.whiteToMove = !tempBoard.boardState.whiteToMove;
-                int kingSquare = tempBoard.kingSquares[tempBoard.boardState.whiteToMove ? Colour.White : Colour.Black];
-                if (MoveGenUtility.IsInCheck(tempBoard, kingSquare))
+                int kingSquare = tempBoard.kingSquares[tempBoard.boardState.GetOpponentColour()]; // original player's king square
+                if (MoveGenUtility.IsInCheck(tempBoard, kingSquare, tempBoard.boardState.GetColourToMove())) // ColourToMove() is actually opponent's colour
                 {
                     continue;
                 }
-                tempBoard.boardState.whiteToMove = !tempBoard.boardState.whiteToMove;
+                legalMoves++;
 
-                int moveScore = -NegaMax(tempBoard, depth - 1, alpha, beta);
+                int moveScore = -NegaMax(tempBoard, depth - 1, ply + 1, alpha, beta);
                 if (moveScore > bestSoFar)
                 {
                     bestSoFar = moveScore;
                 }
             }
 
+            if (legalMoves == 0)
+            {
+                int kingSquare = board.kingSquares[board.boardState.GetColourToMove()]; // opponent's king square
+                if (MoveGenUtility.IsInCheck(board, kingSquare, board.boardState.GetOpponentColour())) // get original colour
+                {
+                    return -999999 + ply;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
             return bestSoFar;
         }
     }

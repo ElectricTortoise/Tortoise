@@ -4,10 +4,9 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
-using TortoiseBot.Core.Board;
-using TortoiseBot.Core.MoveGeneration;
 
-namespace TortoiseBot.Core.Utility
+
+namespace TortoiseBot.Core
 {
     public unsafe class MoveGenUtility
     {
@@ -68,9 +67,9 @@ namespace TortoiseBot.Core.Utility
             return isRook ? MoveGen.RookLookup[square][hash] : MoveGen.BishopLookup[square][hash]; ;
         }
 
-        public static bool IsInCheck(Board.Board board, int kingSquare)
+        public static bool IsInCheck(Board board, int kingSquare, int opponentColour)
         {
-            ulong opponentColourBitboard = board.colourBitboard[board.boardState.GetOpponentColour()];
+            ulong opponentColourBitboard = board.colourBitboard[opponentColour];
             ulong allPieceBitboard = board.allPieceBitboard;
 
 
@@ -78,7 +77,12 @@ namespace TortoiseBot.Core.Utility
             if ((PrecomputedData.KingMask[kingSquare] & opponentColourBitboard & board.pieceBitboard[PieceType.King]) != 0) { return true; };
 
             //Only get the pawn mask if Knight and King doesn't return
-            ulong pawnMask = board.boardState.whiteToMove ? PrecomputedData.WhitePawnCaptureMask[kingSquare] : PrecomputedData.BlackPawnCaptureMask[kingSquare];
+            ulong pawnMask = opponentColour switch
+            {
+                Colour.White => PrecomputedData.BlackPawnCaptureMask[kingSquare],
+                Colour.Black => PrecomputedData.WhitePawnCaptureMask[kingSquare],
+                _ => 0
+            };
             if ((pawnMask & opponentColourBitboard & board.pieceBitboard[PieceType.Pawn]) != 0) { return true; };
 
             //Only get the rook/bishop mask if Pawn doesn't return

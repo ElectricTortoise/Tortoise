@@ -4,10 +4,8 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
-using TortoiseBot.Core.Board;
-using TortoiseBot.Core.Utility;
 
-namespace TortoiseBot.Core.MoveGeneration
+namespace TortoiseBot.Core
 {
     public static unsafe class MoveGen
     {
@@ -21,7 +19,7 @@ namespace TortoiseBot.Core.MoveGeneration
         }
 
 
-        public static void GenAllMoves(Board.Board board, ref MoveList movelist)
+        public static void GenAllMoves(Board board, ref MoveList movelist)
         {
             GenNonSliderMoves(board, PieceType.Knight, ref movelist);
             GenNonSliderMoves(board, PieceType.King, ref movelist);
@@ -32,7 +30,7 @@ namespace TortoiseBot.Core.MoveGeneration
             GenCastlingMoves(board, ref movelist);
         }
 
-        public static void GenNonSliderMoves(Board.Board board, int pieceType, ref MoveList movelist)
+        public static void GenNonSliderMoves(Board board, int pieceType, ref MoveList movelist)
         {
             ulong myColourBitboard = board.colourBitboard[board.boardState.GetColourToMove()];
             ulong myPieceBitboard = board.pieceBitboard[pieceType] & myColourBitboard;
@@ -63,7 +61,7 @@ namespace TortoiseBot.Core.MoveGeneration
             }
         }
 
-        public static void GenSliderMoves(Board.Board board, int pieceType, ref MoveList movelist)
+        public static void GenSliderMoves(Board board, int pieceType, ref MoveList movelist)
         {
             ulong allPieceBitboard = board.allPieceBitboard;
             ulong myColourBitboard = board.colourBitboard[board.boardState.GetColourToMove()];
@@ -98,7 +96,7 @@ namespace TortoiseBot.Core.MoveGeneration
             }
         }
 
-        public static void GenPawnMoves(Board.Board board, ref MoveList movelist)
+        public static void GenPawnMoves(Board board, ref MoveList movelist)
         {
             ulong allPieceBitboard = board.allPieceBitboard;
             ulong myColourBitboard = board.colourBitboard[board.boardState.GetColourToMove()];
@@ -199,7 +197,7 @@ namespace TortoiseBot.Core.MoveGeneration
             }
         }
 
-        public static void GenCastlingMoves(Board.Board board, ref MoveList movelist)
+        public static void GenCastlingMoves(Board board, ref MoveList movelist)
         {
             MoveFlag flag = MoveFlag.Castle;
 
@@ -218,7 +216,7 @@ namespace TortoiseBot.Core.MoveGeneration
             }
         }
 
-        private static bool IsCastlingValid(int startSquare, int targetSquare, Board.Board board)
+        private static bool IsCastlingValid(int startSquare, int targetSquare, Board board)
         {
             ulong allPieceBitboard = board.allPieceBitboard;
             int direction = targetSquare > startSquare ? 1 : -1;
@@ -235,7 +233,7 @@ namespace TortoiseBot.Core.MoveGeneration
                     return false;
                 }
 
-                if (MoveGenUtility.IsInCheck(board, castlingSquare))
+                if (MoveGenUtility.IsInCheck(board, castlingSquare, board.boardState.GetOpponentColour()))
                 {
                     return false;
                 }

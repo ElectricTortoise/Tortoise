@@ -5,15 +5,12 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
-using TortoiseBot.Core.MoveGeneration;
-using TortoiseBot.Core.Search;
-using TortoiseBot.Core.Utility;
 
-namespace TortoiseBot.Core.Evaluation
+namespace TortoiseBot.Core
 {
     public static unsafe class Evaluation
     {
-        public static int Evaluate(Board.Board board)
+        public static int Evaluate(Board board)
         {
             int materialValue = 0;
             int colourToMove = board.boardState.GetColourToMove();

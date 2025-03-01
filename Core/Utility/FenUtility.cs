@@ -4,16 +4,15 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
-using TortoiseBot.Core.Board;
 
-namespace TortoiseBot.Core.Utility
+namespace TortoiseBot.Core  
 {
 
     public unsafe class FenUtility
     {
         public const string StartFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
-        public static void ParseFenString(ref Board.Board board, string fen)
+        public static void ParseFenString(ref Board board, string fen)
         {
             string[] sections = fen.Split(" ");
 

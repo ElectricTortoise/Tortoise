@@ -4,9 +4,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TortoiseBot.Core.Utility;
 
-namespace TortoiseBot.Core.MoveGeneration
+namespace TortoiseBot.Core
 {
     public unsafe class MagicGen
     {

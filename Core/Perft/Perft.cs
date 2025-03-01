@@ -5,16 +5,14 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
-using TortoiseBot.Core.Board;
-using TortoiseBot.Core.MoveGeneration;
-using TortoiseBot.Core.Utility;
+using TortoiseBot.Core;
 
-namespace TortoiseBot.Core.Perft
+namespace TortoiseBot.Core
 {
-    public unsafe class Perft
+    public static unsafe class Perft
     {
 
-        public int FullPerft(Board.Board board, int depth)
+        public static int FullPerft(Board board, int depth)
         {
             int nodes = 0;
             MoveList moveList = new MoveList();
@@ -28,24 +26,22 @@ namespace TortoiseBot.Core.Perft
             for (int i = 0; i < moveList.Length; i++)
             {
                 Move move = new Move(moveList.Moves[i]);
-                Board.Board tempBoard = board;
-                tempBoard.MakeMove(move);
-                tempBoard.boardState.whiteToMove = !tempBoard.boardState.whiteToMove;
-                int kingSquare = tempBoard.kingSquares[tempBoard.boardState.whiteToMove ? Colour.White : Colour.Black];
+                Board tempBoard = board;
+                tempBoard.MakeMove(move); // flips whose turn it is to move
 
-                if (MoveGenUtility.IsInCheck(tempBoard, kingSquare))
+                int kingSquare = tempBoard.kingSquares[tempBoard.boardState.GetOpponentColour()]; // original player's king square
+                if (MoveGenUtility.IsInCheck(tempBoard, kingSquare, tempBoard.boardState.GetColourToMove())) // ColourToMove() is actually opponent's colour
                 {
                     continue;
                 }
 
-                tempBoard.boardState.whiteToMove = !tempBoard.boardState.whiteToMove;
                 nodes += FullPerft(tempBoard, depth - 1);
             }
 
             return nodes;
         }
 
-        public void DividedPerft(Board.Board board, int depth)
+        public static void DividedPerft(Board board, int depth)
         {
             int total = 0;
             MoveList moveList = new MoveList();
@@ -53,18 +49,16 @@ namespace TortoiseBot.Core.Perft
 
             for (int node = 0; node < moveList.Length; node++) 
             {
-                Board.Board tempBoard = board;
+                Board tempBoard = board;
                 Move move = new Move(moveList.Moves[node]);
-                tempBoard.MakeMove(move);
-                tempBoard.boardState.whiteToMove = !tempBoard.boardState.whiteToMove;
-                int kingSquare = tempBoard.kingSquares[tempBoard.boardState.whiteToMove ? Colour.White : Colour.Black];
+                tempBoard.MakeMove(move); // flips whose turn it is to move
 
-                if (MoveGenUtility.IsInCheck(tempBoard, kingSquare))
+                int kingSquare = tempBoard.kingSquares[tempBoard.boardState.GetOpponentColour()]; // original player's king square
+                if (MoveGenUtility.IsInCheck(tempBoard, kingSquare, tempBoard.boardState.GetColourToMove())) // ColourToMove() is actually opponent's colour
                 {
                     continue;
                 }
 
-                tempBoard.boardState.whiteToMove = !tempBoard.boardState.whiteToMove;
                 string startSquare = BoardUtility.GetSquareName(move.StartSquare);
                 string finalSquare = BoardUtility.GetSquareName(move.FinalSquare);
                 int count = FullPerft(tempBoard, depth - 1);
@@ -87,9 +81,9 @@ namespace TortoiseBot.Core.Perft
             Console.WriteLine($"Total positions: {total}");
         }
 
-        public void CheckStandardPositions()
+        public static void CheckStandardPositions()
         {
-            Board.Board board = new Board.Board();
+            Board board = new Board();
             StreamReader sr = new StreamReader("C:\\Users\\Heng Yi\\source\\repos\\TortoiseBot\\Core\\Perft\\standard.epd");
             string line = sr.ReadLine();
             bool flag = false;
@@ -129,7 +123,7 @@ namespace TortoiseBot.Core.Perft
             sr.Close();
         }
 
-        public void PerftSpeed(Board.Board board, int depth)
+        public static void PerftSpeed(Board board, int depth)
         {
             var watch = System.Diagnostics.Stopwatch.StartNew();
             int nodes = FullPerft(board, depth);
