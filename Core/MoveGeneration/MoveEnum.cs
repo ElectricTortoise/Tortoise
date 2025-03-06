@@ -53,7 +53,6 @@ namespace TortoiseBot.Core
         }
     }
 
-
     [Flags]
     public enum MoveFlag : byte
     {
