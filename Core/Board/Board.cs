@@ -119,7 +119,7 @@ namespace TortoiseBot.Core
 
         public void AddPiece(int pieceType, int pieceColour, int square)
         {
-            if (!BoardUtility.IsBitOnBitboard(allPieceBitboard, square))
+            if (!Utility.IsBitOnBitboard(allPieceBitboard, square))
             {
                 allPieceBitboard |= 1UL << square;
                 pieceBitboard[pieceType] |= 1UL << square;
@@ -134,7 +134,7 @@ namespace TortoiseBot.Core
 
         public void RemovePiece(int pieceType, int pieceColour, int square)
         {
-            if (BoardUtility.IsBitOnBitboard(colourBitboard[pieceColour], square) && BoardUtility.IsBitOnBitboard(pieceBitboard[pieceType], square) && (pieceTypesBitboard[square] == pieceType))
+            if (Utility.IsBitOnBitboard(colourBitboard[pieceColour], square) && Utility.IsBitOnBitboard(pieceBitboard[pieceType], square) && (pieceTypesBitboard[square] == pieceType))
             {
                 allPieceBitboard &= ~(1UL << square);
                 pieceBitboard[pieceType] &= ~(1UL << square);
@@ -147,11 +147,11 @@ namespace TortoiseBot.Core
                 {
                     throw new CustomException("No piece to remove");
                 }
-                if (!BoardUtility.IsBitOnBitboard(colourBitboard[pieceColour], square))
+                if (!Utility.IsBitOnBitboard(colourBitboard[pieceColour], square))
                 {
                     throw new CustomException("Tried to remove wrong colour");
                 }
-                if (!BoardUtility.IsBitOnBitboard(pieceBitboard[pieceType], square))
+                if (!Utility.IsBitOnBitboard(pieceBitboard[pieceType], square))
                 {
                     throw new CustomException("Tried to remove wrong piece");
                 }

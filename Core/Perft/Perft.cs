@@ -59,23 +59,10 @@ namespace TortoiseBot.Core
                     continue;
                 }
 
-                string startSquare = BoardUtility.GetSquareName(move.StartSquare);
-                string finalSquare = BoardUtility.GetSquareName(move.FinalSquare);
                 int count = FullPerft(tempBoard, depth - 1);
                 total += count;
-                char flag = move.flag switch
-                {
-                    MoveFlag.PromoteToKnight => 'n',
-                    MoveFlag.PromoteToKnight | MoveFlag.Capture => 'n',
-                    MoveFlag.PromoteToBishop => 'b',
-                    MoveFlag.PromoteToBishop | MoveFlag.Capture => 'b',
-                    MoveFlag.PromoteToRook => 'r',
-                    MoveFlag.PromoteToRook | MoveFlag.Capture => 'r',
-                    MoveFlag.PromoteToQueen => 'q',
-                    MoveFlag.PromoteToQueen | MoveFlag.Capture => 'q',
-                    _ => ' '
-                };
-                Console.WriteLine($"{startSquare}{finalSquare}{flag}: {count}");
+
+                Console.WriteLine($"{Utility.MoveToString(move)}: {count}");
             }
 
             Console.WriteLine($"Total positions: {total}");

@@ -8,7 +8,12 @@ namespace TortoiseBot.Core
 {
     public static class SearchConstants
     {
-        public const int SCORE_INF = 1000000;
-        public const int SCORE_MATE = 999999;
+        public const int AlphaStart = -EvaluationConstants.ScoreMate;
+        public const int BetaStart = EvaluationConstants.ScoreMate;
+
+        public const int MaxSearchTime = int.MaxValue - 1;
+        public const ulong MaxSearchNodes = ulong.MaxValue - 1;
+        public const int MaxDepth = 64;
+        public const int DefaultMovesToGo = 20;
     }
 }

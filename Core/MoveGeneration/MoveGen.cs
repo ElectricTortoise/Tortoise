@@ -50,7 +50,7 @@ namespace TortoiseBot.Core
                 {
                     int targetSquare = BitOperations.TrailingZeroCount(targetSquareBitboard);
                     MoveFlag flag = MoveFlag.Default;
-                    if (BoardUtility.IsBitOnBitboard(opponentColourBitboard, targetSquare))
+                    if (Utility.IsBitOnBitboard(opponentColourBitboard, targetSquare))
                     {
                         flag = MoveFlag.Capture;
                     }
@@ -84,7 +84,7 @@ namespace TortoiseBot.Core
                 {
                     int targetSquare = BitOperations.TrailingZeroCount(targetSquareBitboard);
                     MoveFlag flag = MoveFlag.Default;
-                    if (BoardUtility.IsBitOnBitboard(opponentColourBitboard, targetSquare))
+                    if (Utility.IsBitOnBitboard(opponentColourBitboard, targetSquare))
                     {
                         flag = MoveFlag.Capture;
                     }
@@ -176,7 +176,7 @@ namespace TortoiseBot.Core
                 for (int i = 0; i < 4; i++)
                 {
                     MoveFlag flag = (MoveFlag)((int)initialFlag + i);
-                    if (!BoardUtility.IsBitOnBitboard(allPieceBitboard, targetSquare))
+                    if (!Utility.IsBitOnBitboard(allPieceBitboard, targetSquare))
                     {
                         movelist.AddMove(startSquare, targetSquare, flag);
                     }

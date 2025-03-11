@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO.IsolatedStorage;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,11 +11,40 @@ namespace TortoiseBot.Core
 {
     public static unsafe class Search
     {
-        public static int counter;
+        public static int nodesCounter;
         public static int bestScore;
         public static Move BestMove;
 
-        public static int NegaMax(Board board, int depth, int ply, int alpha, int beta)
+        public static void StartSearch(Board board, ref SearchInformation info)
+        {
+            string move = "";
+            info.SearchActive = true;
+            nodesCounter = 0;
+            bestScore = 0;
+
+            TimeManager.TotalSearchTime.Start();
+            for (int searchDepth = 1; searchDepth < info.DepthLimit + 1; searchDepth++)
+            {
+                NegaMax(board, ref info, searchDepth, 0, SearchConstants.AlphaStart, SearchConstants.BetaStart);
+                long timeInMS = TimeManager.TotalSearchTime.ElapsedMilliseconds;
+                int nps = (int)((nodesCounter / Math.Max(1, timeInMS)) * 1000);
+                move = Utility.MoveToString(BestMove);
+
+                if (info.TimeManager.CheckTime())
+                {
+                    break;
+                }
+
+                Console.WriteLine($"info depth {searchDepth} time {timeInMS} score cp {bestScore} nodes {nodesCounter} nps {nps} pv {move}");
+            }
+
+            TimeManager.TotalSearchTime.Reset();
+
+            Console.WriteLine($"bestmove {move}");
+            info.SearchActive = false;
+        }
+        
+        public static int NegaMax(Board board, ref SearchInformation info, int depth, int ply, int alpha, int beta)
         {
 
             if (depth == 0)
@@ -23,7 +53,7 @@ namespace TortoiseBot.Core
                 return Quiesce(board, alpha, beta);
             }
 
-            int bestSoFar = -SearchConstants.SCORE_INF;
+            int bestSoFar = SearchConstants.AlphaStart;
             int legalMoves = 0;
             MoveList moveList = new MoveList();
             MoveGen.GenAllMoves(board, ref moveList);
@@ -41,10 +71,10 @@ namespace TortoiseBot.Core
                 {
                     continue;
                 }
-                counter++;
+                nodesCounter++;
                 legalMoves++;
 
-                bestSoFar = Math.Max(bestSoFar, -NegaMax(tempBoard, depth - 1, ply + 1, -beta, -alpha));
+                bestSoFar = Math.Max(bestSoFar, -NegaMax(tempBoard, ref info, depth - 1, ply + 1, -beta, -alpha));
                 if (alpha < bestSoFar)
                 {
                     alpha = bestSoFar;
@@ -58,7 +88,13 @@ namespace TortoiseBot.Core
                 if (beta <= bestSoFar)
                 {
                     return bestSoFar;
-                }    
+                }
+
+
+                if (info.TimeManager.CheckTime())
+                {
+                    return bestSoFar;
+                }
             }
 
             if (legalMoves == 0)
@@ -66,13 +102,14 @@ namespace TortoiseBot.Core
                 int kingSquare = board.kingSquares[board.boardState.GetColourToMove()]; 
                 if (MoveGenUtility.IsInCheck(board, kingSquare, board.boardState.GetOpponentColour()))
                 {
-                    return -SearchConstants.SCORE_MATE + ply;
+                    return -EvaluationConstants.ScoreMate + ply;
                 }
                 else
                 {
                     return 0;
                 }
             }
+
             return bestSoFar;
         }
 
@@ -105,7 +142,7 @@ namespace TortoiseBot.Core
                         continue;
                     }
 
-                    Search.counter++;
+                    Search.nodesCounter++;
 
                     bestSoFar = Math.Max(bestSoFar, -Quiesce(tempBoard, -beta, -alpha));
                     alpha = Math.Max(alpha, bestSoFar);

@@ -59,7 +59,7 @@ namespace TortoiseBot.Core
             //En Passant
             if (sections[3] != "-")
             {
-                board.boardState.epTargetSquare = BoardUtility.GetSquareIndex(sections[3].ToString());
+                board.boardState.epTargetSquare = Utility.GetSquareIndex(sections[3].ToString());
             }
 
             //Half move counter
