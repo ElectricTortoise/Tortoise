@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TortoiseBot.Core
+namespace Tortoise.Core
 {
     public readonly struct Move
     {

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 //yoinked from lizard
 
-namespace TortoiseBot.Core
+namespace Tortoise.Core
 {
     public class TimeManager
     {

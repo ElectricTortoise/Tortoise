@@ -5,9 +5,9 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
-using TortoiseBot.Core;
+using Tortoise.Core;
 
-namespace TortoiseBot.Core
+namespace Tortoise.Core
 {
     public static unsafe class Perft
     {

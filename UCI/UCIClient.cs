@@ -5,10 +5,10 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TortoiseBot.Core;
+using Tortoise.Core;
 
 //yoinked from lizard
-namespace TortoiseBot.UCI
+namespace Tortoise.UCI
 {
     public unsafe class UCIClient
     {
@@ -25,8 +25,11 @@ namespace TortoiseBot.UCI
         {
             Console.WriteLine("id name CarrotzDestroyer");
             Console.WriteLine("id author ElectricTortoise");
-            Console.WriteLine("uciok");
 
+            Console.WriteLine("option name Threads type spin default 1 min 1 max 1");
+            Console.WriteLine("option name Hash type spin default 1 min 1 max 1");
+
+            Console.WriteLine("uciok");
             InputLoop();
         }
 

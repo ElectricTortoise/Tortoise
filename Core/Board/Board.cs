@@ -1,6 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 
-namespace TortoiseBot.Core
+namespace Tortoise.Core
 {
 
     public unsafe struct Board

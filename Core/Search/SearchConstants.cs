@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TortoiseBot.Core
+namespace Tortoise.Core
 {
     public static class SearchConstants
     {

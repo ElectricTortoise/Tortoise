@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 
 
-namespace TortoiseBot.Core
+namespace Tortoise.Core
 {
     public static unsafe class Search
     {
@@ -49,8 +49,8 @@ namespace TortoiseBot.Core
 
             if (depth == 0)
             {
-                //return Evaluation.Evaluate(board);
-                return Quiesce(board, alpha, beta);
+                return Evaluation.Evaluate(board);
+                //return Quiesce(board, alpha, beta);
             }
 
             int bestSoFar = SearchConstants.AlphaStart;
@@ -93,7 +93,7 @@ namespace TortoiseBot.Core
 
                 if (info.TimeManager.CheckTime())
                 {
-                    return bestSoFar;
+                    break;
                 }
             }
 

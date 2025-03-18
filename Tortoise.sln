@@ -3,9 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.12.35527.113
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TortoiseBot", "TortoiseBot.csproj", "{B510F822-ADCD-4E1E-8EAA-CEB6C35545D4}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Testing", "..\Testing\Testing.csproj", "{6C84CD2A-DA43-4200-B573-E16499AC3058}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tortoise", "Tortoise.csproj", "{B510F822-ADCD-4E1E-8EAA-CEB6C35545D4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +15,6 @@ Global
 		{B510F822-ADCD-4E1E-8EAA-CEB6C35545D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B510F822-ADCD-4E1E-8EAA-CEB6C35545D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B510F822-ADCD-4E1E-8EAA-CEB6C35545D4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6C84CD2A-DA43-4200-B573-E16499AC3058}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6C84CD2A-DA43-4200-B573-E16499AC3058}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6C84CD2A-DA43-4200-B573-E16499AC3058}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6C84CD2A-DA43-4200-B573-E16499AC3058}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

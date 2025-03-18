@@ -5,7 +5,7 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TortoiseBot.Core
+namespace Tortoise.Core
 {
     public static unsafe class MoveGen
     {
