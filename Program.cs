@@ -16,7 +16,7 @@ namespace Tortoise
             {
                 if (args[0] == "bench")
                 {
-                    SearchBench.Go(3);
+                    SearchBench.Go(4);
                     Environment.Exit(0);
                 }
             }
