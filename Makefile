@@ -1,45 +1,44 @@
-# Force Windows CMD as the shell
-SHELL := cmd.exe
-.SHELLFLAGS := /C
+# Source: https://github.com/lynx-chess/Lynx/blob/main/Makefile
 
-# Default engine name, can be overridden by passing EXE=...
-EXE ?= Tortoise
+.DEFAULT_GOAL := publish
 
-ROOT_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
-PUBLISH_DIR := $(ROOT_DIR)publish
-EXECUTABLE := $(ROOT_DIR)$(EXE)
+EXE=
 
-all: build
+RUNTIME=
+OUTPUT_DIR=artifacts/Tortoise/
 
-build:
-	@echo Building...
-	dotnet publish Tortoise.csproj -c Release -o $(PUBLISH_DIR) --self-contained false
-	@echo Copying published files...
-	@if exist "$(PUBLISH_DIR)\$(EXE).exe" ( \
-		move /Y "$(PUBLISH_DIR)\$(EXE).exe" "$(EXECUTABLE).exe" \
-	)
-	@if exist "$(PUBLISH_DIR)\$(EXE)" ( \
-		move /Y "$(PUBLISH_DIR)\$(EXE)" "$(EXECUTABLE)" \
-	)
-	@xcopy /E /Y /I "$(PUBLISH_DIR)\*" "$(ROOT_DIR)\"
+ifeq ($(OS),Windows_NT)
+	ifeq ($(PROCESSOR_ARCHITEW6432),AMD64)
+		RUNTIME=win-x64
+	else
+		RUNTIME=win-x86
+	endif
+else
+	UNAME_S := $(shell uname -s)
+	UNAME_P := $(shell uname -p)
+	ifeq ($(UNAME_S),Linux)
+		RUNTIME=linux-x64
+		ifneq ($(filter aarch64%,$(UNAME_P)),)
+			RUNTIME=linux-arm64
+		else ifneq ($(filter armv8%,$(UNAME_P)),)
+			RUNTIME=linux-arm64
+		else ifneq ($(filter arm%,$(UNAME_P)),)
+			RUNTIME=linux-arm
+		endif
+	else ifneq ($(filter arm%,$(UNAME_P)),)
+		RUNTIME=osx-arm64
+	else
+		RUNTIME=osx-x64
+	endif
+endif
 
-run: build
-	@echo Running...
-	@if exist "$(EXECUTABLE).exe" ( \
-		"$(EXECUTABLE).exe" \
-	) else if exist "$(EXECUTABLE)" ( \
-		"$(EXECUTABLE)" \
-	)
+ifndef RUNTIME
+	$(error RUNTIME is not set for $(OS) $(UNAME_S) $(UNAME_P))
+endif
 
-clean:
-	@echo Cleaning...
-	dotnet clean
-	@if exist "$(PUBLISH_DIR)" rd /s /q "$(PUBLISH_DIR)"
-	@del /q "$(EXECUTABLE).exe" 2>nul
-	@del /q "$(EXECUTABLE)" 2>nul
+ifdef EXE
+	OUTPUT_DIR=./
+endif
 
-openbench: build
-	@echo Writing OpenBench config...
-	@echo {\"name\":\"$(EXE)\",\"command\":\"$(EXECUTABLE)\"} > engine.json
-
-.PHONY: all build run clean openbench
+publish:
+	dotnet publish Tortoise.csproj --self-contained --runtime ${RUNTIME} /p:PublishSingleFile=true /p:ExecutableName=$(EXE) -o ${OUTPUT_DIR}
