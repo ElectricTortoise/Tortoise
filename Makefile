@@ -5,9 +5,9 @@ SHELL := cmd.exe
 # Default engine name, can be overridden by passing EXE=...
 EXE ?= Tortoise
 
-BUILD_DIR := $(CURDIR)
-PUBLISH_DIR := $(BUILD_DIR)\publish
-EXECUTABLE := $(BUILD_DIR)\$(EXE)
+ROOT_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+PUBLISH_DIR := $(ROOT_DIR)publish
+EXECUTABLE := $(ROOT_DIR)$(EXE)
 
 all: build
 
@@ -21,7 +21,7 @@ build:
 	@if exist "$(PUBLISH_DIR)\$(EXE)" ( \
 		move /Y "$(PUBLISH_DIR)\$(EXE)" "$(EXECUTABLE)" \
 	)
-	@xcopy /E /Y /I "$(PUBLISH_DIR)\*" "$(BUILD_DIR)\"
+	@xcopy /E /Y /I "$(PUBLISH_DIR)\*" "$(ROOT_DIR)\"
 
 run: build
 	@echo Running...
