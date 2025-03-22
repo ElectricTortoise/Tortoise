@@ -12,20 +12,23 @@ namespace Tortoise.Core
     public static unsafe class Search
     {
         public static int nodesCounter;
-        public static int bestScore;
+        public static int BestScore;
+        public static int TempBestScore;
         public static Move BestMove;
+        public static Move TempBestMove;
 
         public static void StartSearch(Board board, ref SearchInformation info)
         {
             string move = "";
             info.SearchActive = true;
             nodesCounter = 0;
-            bestScore = 0;
+            BestScore = 0;
 
             TimeManager.TotalSearchTime.Start();
             for (int searchDepth = 1; searchDepth < info.DepthLimit + 1; searchDepth++)
             {
-                NegaMax(board, ref info, searchDepth, 0, SearchConstants.AlphaStart, SearchConstants.BetaStart);
+                BestScore = NegaMax(board, ref info, searchDepth, 0, SearchConstants.AlphaStart, SearchConstants.BetaStart);
+                BestMove = TempBestMove;
                 long timeInMS = TimeManager.TotalSearchTime.ElapsedMilliseconds;
                 int nps = (int)((nodesCounter / Math.Max(1, timeInMS)) * 1000);
                 move = Utility.MoveToString(BestMove);
@@ -35,7 +38,7 @@ namespace Tortoise.Core
                     break;
                 }
 
-                Console.WriteLine($"info depth {searchDepth} time {timeInMS} score cp {bestScore} nodes {nodesCounter} nps {nps} pv {move}");
+                Console.WriteLine($"info depth {searchDepth} time {timeInMS} score cp {BestScore} nodes {nodesCounter} nps {nps} pv {move}");
             }
 
             TimeManager.TotalSearchTime.Reset();
@@ -80,8 +83,8 @@ namespace Tortoise.Core
                     alpha = bestSoFar;
                     if (ply == 0 && bestSoFar >= alpha)
                     {
-                        bestScore = bestSoFar;
-                        BestMove = move;
+                        TempBestScore = bestSoFar;
+                        TempBestMove = move;
                     }
                 }
 
