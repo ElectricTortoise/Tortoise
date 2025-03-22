@@ -12,7 +12,7 @@ namespace Tortoise.Core
     public static unsafe class Search
     {
         public static int nodesCounter;
-        public static int bestScore;
+        public static int BestScore;
         public static Move BestMove;
 
         public static void StartSearch(Board board, ref SearchInformation info)
@@ -20,12 +20,14 @@ namespace Tortoise.Core
             string move = "";
             info.SearchActive = true;
             nodesCounter = 0;
-            bestScore = 0;
+            BestScore = 0;
 
             TimeManager.TotalSearchTime.Start();
             for (int searchDepth = 1; searchDepth < info.DepthLimit + 1; searchDepth++)
             {
-                NegaMax(board, ref info, searchDepth, 0, SearchConstants.AlphaStart, SearchConstants.BetaStart);
+                NegaMax(board, ref info, searchDepth, 0, SearchConstants.AlphaStart, SearchConstants.BetaStart, out int bestScore, out Move? bestMove);
+                BestScore = bestScore;
+                BestMove = (Move)bestMove;
                 long timeInMS = TimeManager.TotalSearchTime.ElapsedMilliseconds;
                 int nps = (int)((nodesCounter / Math.Max(1, timeInMS)) * 1000);
                 move = Utility.MoveToString(BestMove);
@@ -35,7 +37,7 @@ namespace Tortoise.Core
                     break;
                 }
 
-                Console.WriteLine($"info depth {searchDepth} time {timeInMS} score cp {bestScore} nodes {nodesCounter} nps {nps} pv {move}");
+                Console.WriteLine($"info depth {searchDepth} time {timeInMS} score cp {BestScore} nodes {nodesCounter} nps {nps} pv {move}");
             }
 
             TimeManager.TotalSearchTime.Reset();
@@ -43,9 +45,11 @@ namespace Tortoise.Core
             Console.WriteLine($"bestmove {move}");
             info.SearchActive = false;
         }
-        
-        public static int NegaMax(Board board, ref SearchInformation info, int depth, int ply, int alpha, int beta)
+
+        public static int NegaMax(Board board, ref SearchInformation info, int depth, int ply, int alpha, int beta, out int bestScore, out Move? bestMove)
         {
+            bestScore = SearchConstants.AlphaStart;
+            bestMove = null;
 
             if (depth == 0)
             {
@@ -74,14 +78,14 @@ namespace Tortoise.Core
                 nodesCounter++;
                 legalMoves++;
 
-                bestSoFar = Math.Max(bestSoFar, -NegaMax(tempBoard, ref info, depth - 1, ply + 1, -beta, -alpha));
+                bestSoFar = Math.Max(bestSoFar, -NegaMax(tempBoard, ref info, depth - 1, ply + 1, -beta, -alpha, out bestScore, out bestMove));
                 if (alpha < bestSoFar)
                 {
                     alpha = bestSoFar;
                     if (ply == 0 && bestSoFar >= alpha)
                     {
                         bestScore = bestSoFar;
-                        BestMove = move;
+                        bestMove = move;
                     }
                 }
 
