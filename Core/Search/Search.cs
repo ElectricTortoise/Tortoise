@@ -85,7 +85,7 @@ namespace Tortoise.Core
                     {
                         TempBestScore = bestSoFar;
                         TempBestMove = move;
-                    }
+                    } 
                 }
 
                 if (beta <= bestSoFar)
