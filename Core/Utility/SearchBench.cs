@@ -19,7 +19,7 @@ namespace Tortoise.Core
                 board.Clear();
                 board.LoadPosition(fen);
                 SearchInformation searchInformation = new SearchInformation(board);
-                Search.NegaMax(board, ref searchInformation, depth, 0, SearchConstants.AlphaStart, SearchConstants.BetaStart, out int bestScore, out Move? bestMove);
+                Search.NegaMax(board, ref searchInformation, depth, 0, SearchConstants.AlphaStart, SearchConstants.BetaStart);
             }
             sw.Stop();
 
