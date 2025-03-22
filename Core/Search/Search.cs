@@ -9,7 +9,7 @@ using System.Xml.Linq;
 
 namespace Tortoise.Core
 {
-    public static unsafe class Search
+    public static unsafe class Search 
     {
         public static int nodesCounter;
         public static int bestScore;
