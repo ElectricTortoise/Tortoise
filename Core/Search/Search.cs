@@ -9,13 +9,15 @@ using System.Xml.Linq;
 
 namespace Tortoise.Core
 {
-    public static unsafe class Search 
+    public static unsafe class Search
     {
         public static int nodesCounter;
+
+        private static bool SearchCompleted;
+        private static int TempBestScore;
+        private static Move TempBestMove;
         public static int BestScore;
-        public static int TempBestScore;
         public static Move BestMove;
-        public static Move TempBestMove;
 
         public static void StartSearch(Board board, ref SearchInformation info)
         {
@@ -28,7 +30,10 @@ namespace Tortoise.Core
             for (int searchDepth = 1; searchDepth < info.DepthLimit + 1; searchDepth++)
             {
                 BestScore = NegaMax(board, ref info, searchDepth, 0, SearchConstants.AlphaStart, SearchConstants.BetaStart);
-                BestMove = TempBestMove;
+                if (SearchCompleted)
+                {
+                    BestMove = TempBestMove;
+                }
                 long timeInMS = TimeManager.TotalSearchTime.ElapsedMilliseconds;
                 int nps = (int)((nodesCounter / Math.Max(1, timeInMS)) * 1000);
                 move = Utility.MoveToString(BestMove);
@@ -46,9 +51,10 @@ namespace Tortoise.Core
             Console.WriteLine($"bestmove {move}");
             info.SearchActive = false;
         }
-        
+
         public static int NegaMax(Board board, ref SearchInformation info, int depth, int ply, int alpha, int beta)
         {
+            SearchCompleted = true;
 
             if (depth == 0)
             {
@@ -85,7 +91,7 @@ namespace Tortoise.Core
                     {
                         TempBestScore = bestSoFar;
                         TempBestMove = move;
-                    } 
+                    }
                 }
 
                 if (beta <= bestSoFar)
@@ -96,13 +102,14 @@ namespace Tortoise.Core
 
                 if (info.TimeManager.CheckTime())
                 {
+                    SearchCompleted = false;
                     break;
                 }
             }
 
             if (legalMoves == 0)
             {
-                int kingSquare = board.kingSquares[board.boardState.GetColourToMove()]; 
+                int kingSquare = board.kingSquares[board.boardState.GetColourToMove()];
                 if (MoveGenUtility.IsInCheck(board, kingSquare, board.boardState.GetOpponentColour()))
                 {
                     return -EvaluationConstants.ScoreMate + ply;
@@ -155,7 +162,7 @@ namespace Tortoise.Core
                     }
                 }
             }
-            
+
             return bestSoFar;
         }
     }
