@@ -11,7 +11,7 @@ namespace Tortoise.Core
 {
     public static unsafe class Search
     {
-        public static int nodesCounter;
+        public static int NodesCounter;
 
         private static bool SearchCompleted;
         private static int TempBestScore;
@@ -23,7 +23,7 @@ namespace Tortoise.Core
         {
             string move = "";
             info.SearchActive = true;
-            nodesCounter = 0;
+            NodesCounter = 0;
             BestScore = 0;
 
             TimeManager.TotalSearchTime.Start();
@@ -35,7 +35,7 @@ namespace Tortoise.Core
                     BestMove = TempBestMove;
                 }
                 long timeInMS = TimeManager.TotalSearchTime.ElapsedMilliseconds;
-                int nps = (int)((nodesCounter / Math.Max(1, timeInMS)) * 1000);
+                int nps = (int)((NodesCounter / Math.Max(1, timeInMS)) * 1000);
                 move = Utility.MoveToString(BestMove);
 
                 if (info.TimeManager.CheckTime())
@@ -43,7 +43,7 @@ namespace Tortoise.Core
                     break;
                 }
 
-                Console.WriteLine($"info depth {searchDepth} time {timeInMS} score cp {BestScore} nodes {nodesCounter} nps {nps} pv {move}");
+                Console.WriteLine($"info depth {searchDepth} time {timeInMS} score cp {BestScore} nodes {NodesCounter} nps {nps} pv {move}");
             }
 
             TimeManager.TotalSearchTime.Reset();
@@ -80,7 +80,7 @@ namespace Tortoise.Core
                 {
                     continue;
                 }
-                nodesCounter++;
+                NodesCounter++;
                 legalMoves++;
 
                 bestSoFar = Math.Max(bestSoFar, -NegaMax(tempBoard, ref info, depth - 1, ply + 1, -beta, -alpha));
@@ -152,7 +152,7 @@ namespace Tortoise.Core
                         continue;
                     }
 
-                    Search.nodesCounter++;
+                    Search.NodesCounter++;
 
                     bestSoFar = Math.Max(bestSoFar, -Quiesce(tempBoard, -beta, -alpha));
                     alpha = Math.Max(alpha, bestSoFar);

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -28,7 +29,7 @@ namespace Tortoise.Core
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ushort EncodeMove() 
+        public ushort EncodeMove()
         {
             return (ushort)((ushort)((int)this.flag << 12) | this.StartSquare << 6 | this.FinalSquare);
         }
@@ -50,6 +51,12 @@ namespace Tortoise.Core
             Move move = new Move((byte)startSquare, (byte)targetSquare, flag);
             this.Moves[this.Length] = move.EncodeMove();
             this.Length++;
+        }
+
+        public void OrderMoves()
+        {
+            var moves = MemoryMarshal.CreateSpan(ref this.Moves[0], this.Length);
+            moves.Sort(new MoveOrderer());
         }
     }
 

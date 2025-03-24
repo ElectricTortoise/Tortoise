@@ -23,8 +23,8 @@ namespace Tortoise.Core
             }
             sw.Stop();
 
-            int nps = (int)(Search.nodesCounter / sw.Elapsed.TotalSeconds);
-            Console.WriteLine($"{Search.nodesCounter} nodes {nps} nps");
+            int nps = (int)(Search.NodesCounter / sw.Elapsed.TotalSeconds);
+            Console.WriteLine($"{Search.NodesCounter} nodes {nps} nps");
         }
 
         private static string[] BenchFENs = new string[]
