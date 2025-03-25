@@ -66,6 +66,7 @@ namespace Tortoise.Core
             int legalMoves = 0;
             MoveList moveList = new MoveList();
             MoveGen.GenAllMoves(board, ref moveList);
+            new MoveOrderer(board, ref moveList).OrderMoves();
 
             Board tempBoard = board;
 

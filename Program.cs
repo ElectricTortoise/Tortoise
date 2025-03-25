@@ -16,29 +16,15 @@ namespace Tortoise
             {
                 if (args[0] == "bench") 
                 {
-                    SearchBench.Go(4);
+                    SearchBench.Go(6);
                     Environment.Exit(0);
                 }
             }
             
-            Board board = new Board();
-            board.LoadPosition("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1");
-            MoveList moveList = new MoveList();
-            MoveGen.GenAllMoves(board, ref moveList);
-
-            for (int i = 0; i < moveList.Length; i++) 
-            {
-                Console.WriteLine($"{Utility.MoveToString(new Move(moveList.Moves[i]))}, {new Move(moveList.Moves[i]).flag}");
-            }
-            Console.WriteLine();
-            Console.WriteLine();
-
-            moveList.OrderMoves();
-
-            for (int i = 0; i < moveList.Length; i++)
-            {
-                Console.WriteLine($"{Utility.MoveToString(new Move(moveList.Moves[i]))}, {new Move(moveList.Moves[i]).flag}");
-            }
+            //Board board = new Board();
+            //board.LoadPosition("r3k2r/p2pqpb1/bn2pBp1/2pPN3/1p2P3/2N2Q2/PPP1BPpP/2KR3R b kq - 0 3");
+            //MoveList moveList = new MoveList();
+            //MoveGen.GenAllMoves(board, ref moveList);
 
             DoInputLoop();
         }

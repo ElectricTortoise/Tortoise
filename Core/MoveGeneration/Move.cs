@@ -52,12 +52,6 @@ namespace Tortoise.Core
             this.Moves[this.Length] = move.EncodeMove();
             this.Length++;
         }
-
-        public void OrderMoves()
-        {
-            var moves = MemoryMarshal.CreateSpan(ref this.Moves[0], this.Length);
-            moves.Sort(new MoveOrderer());
-        }
     }
 
     [Flags]
