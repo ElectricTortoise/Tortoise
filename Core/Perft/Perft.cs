@@ -71,7 +71,7 @@ namespace Tortoise.Core
         public static void CheckStandardPositions()
         {
             Board board = new Board();
-            StreamReader sr = new StreamReader("C:\\Users\\Heng Yi\\source\\repos\\TortoiseBot\\Core\\Perft\\standard.epd");
+            StreamReader sr = new StreamReader("C:\\dev\\Tortoise\\Core\\Perft\\standard.epd");
             string line = sr.ReadLine();
             bool flag = false;
             while (line != null)
