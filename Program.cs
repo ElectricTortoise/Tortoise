@@ -29,6 +29,7 @@ namespace Tortoise
 
             //Search.StartSearch(board, ref searchInformation);
 
+
             DoInputLoop();
         }
 
