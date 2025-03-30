@@ -145,7 +145,7 @@ namespace Tortoise.Core
             }
 
             //En Passant
-            if (board.boardState.epTargetSquare != 0)
+            if (board.boardState.epTargetSquare != BoardConstants.NONE_SQUARE)
             {
                 int epTargetSquare = board.boardState.epTargetSquare;
                 ulong epRank = board.boardState.whiteToMove ? PrecomputedData.BlackPawnCaptureMask[epTargetSquare] & 0xff000000UL : PrecomputedData.WhitePawnCaptureMask[epTargetSquare] & 0xff00000000UL;

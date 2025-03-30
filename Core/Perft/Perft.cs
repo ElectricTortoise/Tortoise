@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Tortoise.Core;
 
 namespace Tortoise.Core
@@ -71,7 +72,7 @@ namespace Tortoise.Core
         public static void CheckStandardPositions()
         {
             Board board = new Board();
-            StreamReader sr = new StreamReader("C:\\Users\\Heng Yi\\source\\repos\\TortoiseBot\\Core\\Perft\\standard.epd");
+            StreamReader sr = new StreamReader("C:\\dev\\Tortoise\\Core\\Perft\\standard.epd");
             string line = sr.ReadLine();
             bool flag = false;
             while (line != null)
@@ -108,6 +109,79 @@ namespace Tortoise.Core
                 Console.WriteLine("Error occured");
             }
             sr.Close();
+        }
+
+        public static bool ZobristPerft(Board board, int depth)
+        {
+            bool pass = true;
+            MoveList moveList = new MoveList();
+
+            if (depth == 0)
+            {
+                pass = (Zobrist.GetZobristHash(board) == board.zobristHash);
+
+                if (!pass)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine($"True hash -> 0x{Zobrist.GetZobristHash(board).ToString("x").PadRight(20, ' ')}   Current hash -> 0x{board.zobristHash.ToString("x").PadRight(20, ' ')}   Difference 0x{(Zobrist.GetZobristHash(board) ^ board.zobristHash).ToString("x")}");
+                    pass = false;
+                }
+                return pass;
+            }
+
+            MoveGen.GenAllMoves(board, ref moveList);
+            for (int i = 0; i < moveList.Length; i++)
+            {
+                Move move = new Move(moveList.Moves[i]);
+                Board tempBoard = board;
+                tempBoard.MakeMove(move); // flips whose turn it is to move
+
+                int kingSquare = tempBoard.kingSquares[tempBoard.boardState.GetOpponentColour()]; // original player's king square
+                if (MoveGenUtility.IsInCheck(tempBoard, kingSquare, tempBoard.boardState.GetColourToMove())) // ColourToMove() is actually opponent's colour
+                {
+                    continue;
+                }
+
+                bool tempPass = (Zobrist.GetZobristHash(board) == board.zobristHash);
+                if (!tempPass)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine($"True hash -> 0x{Zobrist.GetZobristHash(tempBoard).ToString("x").PadRight(20, ' ')}   Current hash -> 0x{tempBoard.zobristHash.ToString("x").PadRight(20, ' ')}   Difference 0x{(Zobrist.GetZobristHash(tempBoard) ^ tempBoard.zobristHash).ToString("x")}");
+                    pass = false;
+                    continue;
+                }
+
+                tempPass = ZobristPerft(tempBoard, depth - 1);
+                if (!tempPass) { pass = false; }
+            }
+
+            return pass;
+        }
+
+        public static void DividedZobristPerft(Board board, int depth)
+        {
+            MoveList moveList = new MoveList();
+            MoveGen.GenAllMoves(board, ref moveList);
+
+            for (int node = 0; node < moveList.Length; node++)
+            {
+                Board tempBoard = board;
+                Move move = new Move(moveList.Moves[node]);
+                tempBoard.MakeMove(move); // flips whose turn it is to move
+
+                int kingSquare = tempBoard.kingSquares[tempBoard.boardState.GetOpponentColour()]; // original player's king square
+                if (MoveGenUtility.IsInCheck(tempBoard, kingSquare, tempBoard.boardState.GetColourToMove())) // ColourToMove() is actually opponent's colour
+                {
+                    continue;
+                }
+
+                bool pass = ZobristPerft(tempBoard, depth - 1);
+                string str;
+
+                if (!pass) { Console.ForegroundColor = ConsoleColor.Red; str = "fail"; }
+                else { Console.ForegroundColor = ConsoleColor.Green; str = "pass"; }
+                Console.WriteLine($"{Utility.MoveToString(move)}: {str}");
+            }
         }
 
         public static void PerftSpeed(Board board, int depth)

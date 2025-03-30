@@ -61,6 +61,10 @@ namespace Tortoise.Core
             {
                 board.boardState.epTargetSquare = Utility.GetSquareIndex(sections[3].ToString());
             }
+            else
+            {
+                board.boardState.epTargetSquare = BoardConstants.NONE_SQUARE;
+            }
 
             //Half move counter
             board.boardState.halfmoveClock = int.Parse(sections[4]);
@@ -71,6 +75,8 @@ namespace Tortoise.Core
             //King Square
             board.kingSquares[Colour.Black] = BitOperations.TrailingZeroCount(board.pieceBitboard[PieceType.King] & board.colourBitboard[Colour.Black]);
             board.kingSquares[Colour.White] = BitOperations.TrailingZeroCount(board.pieceBitboard[PieceType.King] & board.colourBitboard[Colour.White]);
+
+            board.zobristHash = Zobrist.GetZobristHash(board);
         }
     }
 }

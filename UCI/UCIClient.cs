@@ -65,7 +65,7 @@ namespace Tortoise.UCI
                 }
                 else if (cmd == "ucinewgame")
                 {
-                    continue; 
+                    Search.RepetitionHistory.Clear(); 
                 }
                 else if (cmd == "position")
                 {
@@ -94,6 +94,9 @@ namespace Tortoise.UCI
                 board.LoadStartingPosition();
             }
 
+            Search.RepetitionHistory.Clear();
+            Search.RepetitionHistory.Push(board.zobristHash);
+
             var moves = input.SkipWhile(x => x != "moves").Skip(1).ToArray();
 
             for (int i = 0; i < moves.Length; i++)
@@ -104,12 +107,27 @@ namespace Tortoise.UCI
 
                 MoveFlag flag = new MoveFlag();
 
+                flag = MoveFlag.Default;
+
                 if (Utility.IsBitOnBitboard(board.allPieceBitboard, finalSquare)) 
                 {
                     flag = MoveFlag.Capture; 
                 } //capture
 
-                else if ((startSquare == 60 && board.kingSquares[Colour.White] == 60) || (startSquare == 4 && board.kingSquares[Colour.Black] == 4)) 
+
+                if (promotingPiece != "")
+                {
+                    flag |= promotingPiece switch
+                    {
+                        "q" => MoveFlag.PromoteToQueen,
+                        "r" => MoveFlag.PromoteToRook,
+                        "b" => MoveFlag.PromoteToBishop,
+                        "k" => MoveFlag.PromoteToKnight,
+                        _ => MoveFlag.Default
+                    };
+                } // promotion
+
+                if ((startSquare == 60 && board.kingSquares[Colour.White] == 60) || (startSquare == 4 && board.kingSquares[Colour.Black] == 4)) 
                 {
                     bool kingSide = board.boardState.whiteToMove ? board.boardState.whiteKingCastle : board.boardState.blackKingCastle;
                     bool queenSide = board.boardState.whiteToMove ? board.boardState.whiteQueenCastle : board.boardState.blackQueenCastle;
@@ -125,22 +143,20 @@ namespace Tortoise.UCI
                     }
                 } //castling
 
-                else if (promotingPiece != "")
-                {
-                    flag = promotingPiece switch
-                    {
-                        "q" => MoveFlag.PromoteToQueen,
-                        "r" => MoveFlag.PromoteToRook,
-                        "b" => MoveFlag.PromoteToBishop,
-                        "k" => MoveFlag.PromoteToKnight,
-                        _ => MoveFlag.Default
-                    };
-                } // promotion
 
-                else
+                if (board.pieceTypesBitboard[startSquare] == PieceType.Pawn)
                 {
-                    flag = MoveFlag.Default;
-                } // default
+                    if ((moves[i].Substring(1, 1) == "2" && moves[i].Substring(3, 1) == "4") || (moves[i].Substring(1, 1) == "7" && moves[i].Substring(3, 1) == "5"))
+                    {
+                        flag = MoveFlag.DoublePush;
+                    }
+
+                    if ((moves[i].Substring(0, 1) != moves[i].Substring(2, 1)) && !Utility.IsBitOnBitboard(board.allPieceBitboard, finalSquare))
+                    {
+                        flag = MoveFlag.EnPassant | MoveFlag.Capture;
+                    }
+                } //funny pawn moves (EP and double push)
+
 
                 Move move = new Move((byte)startSquare, (byte)finalSquare, flag);
                 board.MakeMove(move); // flips whose turn it is to move
@@ -150,6 +166,8 @@ namespace Tortoise.UCI
                 {
                     continue;
                 }
+
+                Search.RepetitionHistory.Push(board.zobristHash);
             }
 
             info = new SearchInformation(board);

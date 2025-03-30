@@ -8,7 +8,7 @@ using Tortoise.UCI;
 
 namespace Tortoise
 {
-    public unsafe static class Program
+    public static unsafe class Program
     {
         public static void Main(string[] args)
         {
@@ -20,11 +20,15 @@ namespace Tortoise
                     Environment.Exit(0);
                 }
             }
-            
+
             //Board board = new Board();
-            //board.LoadPosition("r3k2r/p2pqpb1/bn2pBp1/2pPN3/1p2P3/2N2Q2/PPP1BPpP/2KR3R b kq - 0 3");
             //MoveList moveList = new MoveList();
-            //MoveGen.GenAllMoves(board, ref moveList);
+
+            //SearchInformation searchInformation = new SearchInformation(board, 2);
+
+            //Search.StartSearch(board, ref searchInformation);
+
+
 
             DoInputLoop();
         }
