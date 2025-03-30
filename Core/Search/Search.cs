@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO.IsolatedStorage;
 using System.Linq;
@@ -11,7 +12,7 @@ namespace Tortoise.Core
 {
     public static unsafe class Search
     {
-        public static List<ulong> RepetitionHistory;
+        public static Stack<ulong> RepetitionHistory;
 
         public static int NodesCounter;
 
@@ -23,7 +24,7 @@ namespace Tortoise.Core
 
         static Search()
         {
-            RepetitionHistory = new List<ulong>();
+            RepetitionHistory = new Stack<ulong>();
         }
 
         public static void StartSearch(Board board, ref SearchInformation info)
@@ -41,6 +42,11 @@ namespace Tortoise.Core
                 {
                     BestMove = TempBestMove;
                 }
+
+                //for (int i = 0; i < searchDepth - 1; i++)
+                //{
+                //    RepetitionHistory.Pop();
+                //}
                 long timeInMS = TimeManager.TotalSearchTime.ElapsedMilliseconds;
                 int nps = (int)((NodesCounter / Math.Max(1, timeInMS)) * 1000);
                 move = Utility.MoveToString(BestMove);
@@ -59,10 +65,17 @@ namespace Tortoise.Core
             info.SearchActive = false;
         }
 
+
+        public static void PrintValues(IEnumerable myCollection)
+        {
+            foreach (Object obj in myCollection)
+                Console.Write("    {0}", obj);
+            Console.WriteLine();
+        }
         public static int NegaMax(Board board, ref SearchInformation info, int depth, int ply, int alpha, int beta)
         {
             SearchCompleted = true;
-            int repeatedMoves = 1;
+            
 
             if (depth == 0)
             {
@@ -79,6 +92,7 @@ namespace Tortoise.Core
 
             for (int i = 0; i < moveList.Length; i++)
             {
+                int repeatedMoves = 0;
                 Move move = new Move(moveList.Moves[i]);
                 tempBoard = board;
                 tempBoard.MakeMove(move); // flips whose turn it is to move
@@ -88,13 +102,13 @@ namespace Tortoise.Core
                 {
                     continue;
                 }
+                RepetitionHistory.Push(tempBoard.zobristHash);
                 NodesCounter++;
                 legalMoves++;
 
-                ulong currentHash = Zobrist.GetZobristHash(tempBoard);
                 foreach (ulong hash in RepetitionHistory)
                 {
-                    if (currentHash == hash) { repeatedMoves++; }
+                    if (tempBoard.zobristHash == hash) { repeatedMoves++; }
                 }
 
                 if (repeatedMoves >= 3)
@@ -118,6 +132,7 @@ namespace Tortoise.Core
 
                 if (beta <= bestSoFar)
                 {
+                    RepetitionHistory.Pop();
                     return bestSoFar;
                 }
 
@@ -127,6 +142,8 @@ namespace Tortoise.Core
                     SearchCompleted = false;
                     break;
                 }
+
+                RepetitionHistory.Pop();
             }
 
             if (legalMoves == 0)

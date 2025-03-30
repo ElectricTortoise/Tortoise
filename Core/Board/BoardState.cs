@@ -31,37 +31,37 @@ namespace Tortoise.Core
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void ToggleWhiteCastling()
+        public void DisableWhiteCastling()
         {
             whiteKingCastle = false; whiteQueenCastle = false;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void ToggleBlackCastling()
+        public void DisableBlackCastling()
         {
             blackKingCastle = false; blackQueenCastle = false;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void ToggleWhiteKingCastling()
+        public void DisableWhiteKingCastling()
         {
             whiteKingCastle = false;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void ToggleWhiteQueenCastling()
+        public void DisableWhiteQueenCastling()
         {
             whiteQueenCastle = false;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void ToggleBlackKingCastling()
+        public void DisableBlackKingCastling()
         {
             blackKingCastle = false;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void ToggleBlackQueenCastling()
+        public void DisableBlackQueenCastling()
         {
             blackQueenCastle = false;
         }

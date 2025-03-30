@@ -95,7 +95,7 @@ namespace Tortoise.UCI
             }
 
             Search.RepetitionHistory.Clear();
-            Search.RepetitionHistory.Add(Zobrist.GetZobristHash(board));
+            Search.RepetitionHistory.Push(board.zobristHash);
 
             var moves = input.SkipWhile(x => x != "moves").Skip(1).ToArray();
 
@@ -167,7 +167,7 @@ namespace Tortoise.UCI
                     continue;
                 }
 
-                Search.RepetitionHistory.Add(Zobrist.GetZobristHash(board));
+                Search.RepetitionHistory.Push(board.zobristHash);
             }
 
             info = new SearchInformation(board);
