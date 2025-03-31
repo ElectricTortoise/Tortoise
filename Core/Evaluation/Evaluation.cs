@@ -24,7 +24,7 @@ namespace Tortoise.Core
                 piecesLeft++;
             }
 
-            bool endgame = ((piecesLeft <= 10) && ((board.pieceBitboard[PieceType.Queen] & board.colourBitboard[opponentColour]) == 0UL));
+            bool endgame = ((piecesLeft <= 12) && ((board.pieceBitboard[PieceType.Queen] & board.colourBitboard[opponentColour]) == 0UL)) || (piecesLeft <= 7);
 
             for (int pieceType = 0; pieceType < 5; pieceType++) 
             {
