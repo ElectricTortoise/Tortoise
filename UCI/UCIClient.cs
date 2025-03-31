@@ -122,7 +122,7 @@ namespace Tortoise.UCI
                         "q" => MoveFlag.PromoteToQueen,
                         "r" => MoveFlag.PromoteToRook,
                         "b" => MoveFlag.PromoteToBishop,
-                        "k" => MoveFlag.PromoteToKnight,
+                        "n" => MoveFlag.PromoteToKnight,
                         _ => MoveFlag.Default
                     };
                 } // promotion
