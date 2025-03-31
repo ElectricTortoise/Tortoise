@@ -26,7 +26,7 @@ namespace Tortoise.Core
 
             bool endgame = ((piecesLeft <= 12) && ((board.pieceBitboard[PieceType.Queen] & board.colourBitboard[opponentColour]) == 0UL)) || (piecesLeft <= 7);
 
-            for (int pieceType = 0; pieceType < 5; pieceType++) 
+            for (int pieceType = 0; pieceType < 6; pieceType++) 
             {
                 ulong myPieceBitboard = board.pieceBitboard[pieceType] & board.colourBitboard[colourToMove];
                 ulong opponentPieceBitboard = board.pieceBitboard[pieceType] & board.colourBitboard[opponentColour];
@@ -75,6 +75,7 @@ namespace Tortoise.Core
                     PieceType.Bishop => PieceSquareTable.endgameBishopTable[square],
                     PieceType.Rook => PieceSquareTable.endgameRookTable[square],
                     PieceType.Queen => PieceSquareTable.endgameQueenTable[square],
+                    PieceType.King => PieceSquareTable.endgameKingTable[square],
                     _ => 0
                 };
             }
@@ -87,6 +88,7 @@ namespace Tortoise.Core
                     PieceType.Bishop => PieceSquareTable.midgameBishopTable[square],
                     PieceType.Rook => PieceSquareTable.midgameRookTable[square],
                     PieceType.Queen => PieceSquareTable.midgameQueenTable[square],
+                    PieceType.King => PieceSquareTable.midgameKingTable[square],
                     _ => 0
                 };
             }
