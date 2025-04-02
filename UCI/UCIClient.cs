@@ -127,7 +127,7 @@ namespace Tortoise.UCI
                     };
                 } // promotion
 
-                if ((startSquare == 60 && board.kingSquares[Colour.White] == 60) || (startSquare == 4 && board.kingSquares[Colour.Black] == 4)) 
+                if ((startSquare == BoardConstants.e1 && board.kingSquares[Colour.White] == BoardConstants.e1) || (startSquare == BoardConstants.e8 && board.kingSquares[Colour.Black] == BoardConstants.e8)) 
                 {
                     bool kingSide = board.boardState.whiteToMove ? board.boardState.whiteKingCastle : board.boardState.blackKingCastle;
                     bool queenSide = board.boardState.whiteToMove ? board.boardState.whiteQueenCastle : board.boardState.blackQueenCastle;

@@ -115,7 +115,7 @@ namespace Tortoise.Core
             }
 
             //Double Move
-            ulong DoubleMoveTargetRank = board.boardState.whiteToMove ? 0xff00000000UL : 0xff000000UL;
+            ulong DoubleMoveTargetRank = board.boardState.whiteToMove ? BoardConstants.rank4 : BoardConstants.rank5;
             ulong doublePushMask = (board.boardState.whiteToMove ? (singlePushMask >> 8) : (singlePushMask << 8)) & ~allPieceBitboard & DoubleMoveTargetRank;
             while (doublePushMask != 0)
             {
@@ -148,8 +148,8 @@ namespace Tortoise.Core
             if (board.boardState.epTargetSquare != BoardConstants.NONE_SQUARE)
             {
                 int epTargetSquare = board.boardState.epTargetSquare;
-                ulong epRank = board.boardState.whiteToMove ? PrecomputedData.BlackPawnCaptureMask[epTargetSquare] & 0xff000000UL : PrecomputedData.WhitePawnCaptureMask[epTargetSquare] & 0xff00000000UL;
-                ulong epAttacker = myPieceBitboard & epRank;
+                ulong epAttackSquares = board.boardState.whiteToMove ? PrecomputedData.BlackPawnCaptureMask[epTargetSquare] & BoardConstants.rank5 : PrecomputedData.WhitePawnCaptureMask[epTargetSquare] & BoardConstants.rank4;
+                ulong epAttacker = myPieceBitboard & epAttackSquares;
                 if (epAttacker != 0)
                 {
                     while (epAttacker != 0)
@@ -164,7 +164,7 @@ namespace Tortoise.Core
             }
 
             //Promotion
-            ulong promotingPawnSquares = (board.boardState.whiteToMove ? 0xff00UL : 0xff000000000000UL) & myPieceBitboard;
+            ulong promotingPawnSquares = (board.boardState.whiteToMove ? BoardConstants.rank7 : BoardConstants.rank2) & myPieceBitboard;
 
             
             while (promotingPawnSquares != 0)
@@ -201,7 +201,7 @@ namespace Tortoise.Core
         {
             MoveFlag flag = MoveFlag.Castle;
 
-            int startSquare = board.boardState.whiteToMove ? 60 : 4;
+            int startSquare = board.boardState.whiteToMove ? BoardConstants.e1 : BoardConstants.e8;
             bool kingSide = board.boardState.whiteToMove ? board.boardState.whiteKingCastle : board.boardState.blackKingCastle;
             bool queenSide = board.boardState.whiteToMove ? board.boardState.whiteQueenCastle : board.boardState.blackQueenCastle;
 
@@ -220,7 +220,7 @@ namespace Tortoise.Core
         {
             ulong allPieceBitboard = board.allPieceBitboard;
             int direction = targetSquare > startSquare ? 1 : -1;
-            int annoyingSquareThatIHadToCheck = board.boardState.whiteToMove ? 57 : 1;
+            int annoyingSquareThatIHadToCheck = board.boardState.whiteToMove ? BoardConstants.b1 : BoardConstants.b8;
             for (int castlingSquare = startSquare; castlingSquare != targetSquare; castlingSquare += direction)
             {
                 if ((allPieceBitboard & (1UL << (castlingSquare + direction))) != 0)

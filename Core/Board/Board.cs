@@ -87,21 +87,21 @@ namespace Tortoise.Core
                     AddPiece(myPieceType, myPieceColour, move.FinalSquare);
                     switch (move.FinalSquare)
                     {
-                        case 6:
-                            RemovePiece(PieceType.Rook, Colour.Black, 7);
-                            AddPiece(PieceType.Rook, Colour.Black, 5);
+                        case BoardConstants.g8:
+                            RemovePiece(PieceType.Rook, Colour.Black, BoardConstants.h8);
+                            AddPiece(PieceType.Rook, Colour.Black, BoardConstants.f8);
                             break;
-                        case 2:
-                            RemovePiece(PieceType.Rook, Colour.Black, 0);
-                            AddPiece(PieceType.Rook, Colour.Black, 3);
+                        case BoardConstants.c8:
+                            RemovePiece(PieceType.Rook, Colour.Black, BoardConstants.a8);
+                            AddPiece(PieceType.Rook, Colour.Black, BoardConstants.d8);
                             break;
-                        case 62:
-                            RemovePiece(PieceType.Rook, Colour.White, 63);
-                            AddPiece(PieceType.Rook, Colour.White, 61);
+                        case BoardConstants.g1:
+                            RemovePiece(PieceType.Rook, Colour.White, BoardConstants.h1);
+                            AddPiece(PieceType.Rook, Colour.White, BoardConstants.f1);
                             break;
-                        case 58:
-                            RemovePiece(PieceType.Rook, Colour.White, 56);
-                            AddPiece(PieceType.Rook, Colour.White, 59);
+                        case BoardConstants.c1:
+                            RemovePiece(PieceType.Rook, Colour.White, BoardConstants.a1);
+                            AddPiece(PieceType.Rook, Colour.White, BoardConstants.d1);
                             break;
                     }
                     break;
@@ -129,18 +129,18 @@ namespace Tortoise.Core
 
             if (this.boardState.whiteKingCastle || this.boardState.whiteQueenCastle)
             {
-                if (pieceTypesBitboard[60] != PieceType.King)
+                if (pieceTypesBitboard[BoardConstants.e1] != PieceType.King)
                 {
                     if (this.boardState.whiteKingCastle) { zobristHash ^= Zobrist.ZobristCastling[0]; }
                     if (this.boardState.whiteQueenCastle) { zobristHash ^= Zobrist.ZobristCastling[1]; }
                     this.boardState.DisableWhiteCastling();
                 };
-                if (pieceTypesBitboard[63] != PieceType.Rook)
+                if (pieceTypesBitboard[BoardConstants.h1] != PieceType.Rook)
                 {
                     if (this.boardState.whiteKingCastle) { zobristHash ^= Zobrist.ZobristCastling[0]; }
                     this.boardState.DisableWhiteKingCastling();
                 };
-                if (pieceTypesBitboard[56] != PieceType.Rook)
+                if (pieceTypesBitboard[BoardConstants.a1] != PieceType.Rook)
                 {
                     if (this.boardState.whiteQueenCastle) { zobristHash ^= Zobrist.ZobristCastling[1]; }
                     this.boardState.DisableWhiteQueenCastling();
@@ -149,18 +149,18 @@ namespace Tortoise.Core
 
             if (this.boardState.blackKingCastle || this.boardState.blackQueenCastle)
             {
-                if (pieceTypesBitboard[4] != PieceType.King)
+                if (pieceTypesBitboard[BoardConstants.e8] != PieceType.King)
                 {
                     if (this.boardState.blackKingCastle) { zobristHash ^= Zobrist.ZobristCastling[2]; }
                     if (this.boardState.blackQueenCastle) { zobristHash ^= Zobrist.ZobristCastling[3]; }
                     this.boardState.DisableBlackCastling();
                 }
-                if (pieceTypesBitboard[7] != PieceType.Rook)
+                if (pieceTypesBitboard[BoardConstants.h8] != PieceType.Rook)
                 {
                     if (this.boardState.blackKingCastle) { zobristHash ^= Zobrist.ZobristCastling[2]; }
                     this.boardState.DisableBlackKingCastling();
                 }
-                if (pieceTypesBitboard[0] != PieceType.Rook)
+                if (pieceTypesBitboard[BoardConstants.a8] != PieceType.Rook)
                 {
                     if (this.boardState.blackQueenCastle) { zobristHash ^= Zobrist.ZobristCastling[3]; }
                     this.boardState.DisableBlackQueenCastling();

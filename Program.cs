@@ -21,12 +21,14 @@ namespace Tortoise
                 }
             }
 
-            //Board board = new Board();
-            //MoveList moveList = new MoveList();
+            Board board = new Board();
+            MoveList moveList = new MoveList();
 
-            //SearchInformation searchInformation = new SearchInformation(board, 2);
+            board.LoadPosition("4k2r/3np1pp/3n4/8/1Q6/B5P1/p3P1P1/2NQRKR1 b k - 0 1");
 
-            //Search.StartSearch(board, ref searchInformation);
+            SearchInformation searchInformation = new SearchInformation(board, 5);
+
+            Search.StartSearch(board, ref searchInformation);
 
 
 
