@@ -21,10 +21,26 @@ namespace Tortoise.Core
 
             ScoredMoves.Sort(new MoveSorter());
 
+            //for (int i = 0; i < moveList.Length; i++)
+            //{
+            //    Console.WriteLine($"{Utility.MoveToString(ScoredMoves[i].move)}, {ScoredMoves[i].move.flag}");
+            //}
+
+            //Console.WriteLine();
+            //Console.WriteLine();
+            //Console.WriteLine();
+            //Console.WriteLine();
+
+
             for (int i = 0; i < moveList.Length; i++)
             {
                 moveList.Moves[i] = ScoredMoves[i].move.EncodeMove();
             }
+
+            //for (int i = 0; i < moveList.Length; i++)
+            //{
+            //    Console.WriteLine($"{Utility.MoveToString(new Move(moveList.Moves[i]))}, {new Move(moveList.Moves[i]).flag}");
+            //}
         }
     }
 
