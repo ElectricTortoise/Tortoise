@@ -19,15 +19,20 @@ namespace Tortoise.Core
             this.score = 0;
             this.move = move;
 
-            if ((move.flag & MoveFlag.PromoteToKnight) != 0)
-            {
-                this.score += 2;
-            }
-
             if ((move.flag & MoveFlag.Capture) != 0)
             {
-                this.score += board.pieceTypesBitboard[move.FinalSquare] - board.pieceTypesBitboard[move.StartSquare];
+                this.score += board.pieceTypesBitboard[move.FinalSquare]/*victim*/ * 1000 - board.pieceTypesBitboard[move.StartSquare] /*attacker*/ + 100000;
             }
+
+            if ((move.flag & MoveFlag.PromoteToKnight) != 0)
+            {
+                this.score += 100;
+            }
+
+            //if ((move.flag & MoveFlag.Castle) != 0)
+            //{
+            //    this.score += 50;
+            //}
         }
 
         public ScoredMove(ref Board board, ushort move)

@@ -16,18 +16,18 @@ namespace Tortoise
             {
                 if (args[0] == "bench") 
                 {
-                    SearchBench.Go(4);
+                    SearchBench.Go(6);
                     Environment.Exit(0);
                 }
             }
 
-            Board board = new Board();
-            MoveList moveList = new MoveList();
+            //Board board = new Board();
+            //MoveList moveList = new MoveList();
 
-            board.LoadPosition("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1");
+            //board.LoadPosition("r3k2r/p1ppqpb1/bnN1p1p1/3P4/1p2n1Q1/P1N5/1PPBBPpP/R3K2R b KQkq - 0 3");
 
-            MoveGen.GenAllMoves(board, ref moveList);
-            MoveOrderer.OrderMoves(ref board, ref moveList);
+            //MoveGen.GenAllMoves(board, ref moveList);
+            //MoveOrderer.OrderMoves(ref board, ref moveList);
             //SearchInformation searchInformation = new SearchInformation(board, 5);
 
             //Search.StartSearch(board, ref searchInformation);
