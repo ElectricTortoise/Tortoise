@@ -43,10 +43,6 @@ namespace Tortoise.Core
                     BestMove = TempBestMove;
                 }
 
-                //for (int i = 0; i < searchDepth - 1; i++)
-                //{
-                //    RepetitionHistory.Pop();
-                //}
                 long timeInMS = TimeManager.TotalSearchTime.ElapsedMilliseconds;
                 int nps = (int)((NodesCounter / Math.Max(1, timeInMS)) * 1000);
                 move = Utility.MoveToString(BestMove);
@@ -87,7 +83,7 @@ namespace Tortoise.Core
             int legalMoves = 0;
             MoveList moveList = new MoveList();
             MoveGen.GenAllMoves(board, ref moveList);
-            new MoveOrderer(board, ref moveList).OrderMoves();
+            MoveOrderer.OrderMoves(ref board, ref moveList);
 
             Board tempBoard = board;
 

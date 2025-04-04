@@ -24,11 +24,18 @@ namespace Tortoise
             //Board board = new Board();
             //MoveList moveList = new MoveList();
 
-            //board.LoadPosition("4k2r/3np1pp/3n4/8/1Q6/B5P1/p3P1P1/2NQRKR1 b k - 0 1");
+            //board.LoadPosition("r3k2r/p1ppqpb1/bnN1p1p1/3P4/1p2n1Q1/P1N5/1PPBBPpP/R3K2R b KQkq - 0 3");
 
+            //MoveGen.GenAllMoves(board, ref moveList);
+            //MoveOrderer.OrderMoves(ref board, ref moveList);
             //SearchInformation searchInformation = new SearchInformation(board, 5);
 
             //Search.StartSearch(board, ref searchInformation);
+
+            //for (int i = 0; i < moveList.Length; i++)
+            //{
+            //    Console.WriteLine($"{Utility.MoveToString(new Move(moveList.Moves[i]))}, {new Move(moveList.Moves[i]).flag}");
+            //}
 
             DoInputLoop();
         }
