@@ -77,7 +77,7 @@ namespace Tortoise.Core
             MoveGen.GenAllMoves(board, ref moveList);
             MoveOrderer.OrderMoves(ref board, ref moveList);
 
-            Board tempBoard = board;
+            Board tempBoard;
 
             for (int i = 0; i < moveList.Length; i++)
             {
@@ -99,7 +99,6 @@ namespace Tortoise.Core
                 {
                     if (tempBoard.zobristHash == hash) { repeatedMoves++; }
                 }
-
                 if (repeatedMoves >= 3)
                 {
                     bestSoFar = Math.Max(bestSoFar, 0);
@@ -165,7 +164,7 @@ namespace Tortoise.Core
             MoveList moveList = new MoveList();
             MoveGen.GenAllMoves(board, ref moveList); // a bit of time is wasted generating non-capture moves
             MoveOrderer.OrderMoves(ref board, ref moveList);
-            Board tempBoard = board;
+            Board tempBoard;
 
             for (int i = 0; i < moveList.Length; i++)
             {
@@ -182,6 +181,7 @@ namespace Tortoise.Core
                     }
 
                     Search.NodesCounter++;
+
 
                     bestSoFar = Math.Max(bestSoFar, -Quiesce(tempBoard, -beta, -alpha));
                     alpha = Math.Max(alpha, bestSoFar);

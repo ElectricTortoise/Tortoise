@@ -52,6 +52,14 @@ namespace Tortoise.Core
             this.Moves[this.Length] = move.EncodeMove();
             this.Length++;
         }
+
+        public void PrintValues()
+        {
+            for (int i = 0; i < Length; i++)
+            {
+                Console.WriteLine($"{Utility.MoveToString(new Move(Moves[i]))}, {new Move(Moves[i]).flag}");
+            }
+        }
     }
 
     [Flags]
