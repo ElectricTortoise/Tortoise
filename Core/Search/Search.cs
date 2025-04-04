@@ -61,13 +61,6 @@ namespace Tortoise.Core
             info.SearchActive = false;
         }
 
-
-        public static void PrintValues(IEnumerable myCollection)
-        {
-            foreach (Object obj in myCollection)
-                Console.Write("    {0}", obj);
-            Console.WriteLine();
-        }
         public static int NegaMax(Board board, ref SearchInformation info, int depth, int ply, int alpha, int beta)
         {
             SearchCompleted = true;
@@ -75,8 +68,7 @@ namespace Tortoise.Core
 
             if (depth == 0)
             {
-                return Evaluation.Evaluate(board);
-                //return Quiesce(board, alpha, beta);
+                return Quiesce(board, alpha, beta);
             }
 
             int bestSoFar = SearchConstants.AlphaStart;
@@ -172,12 +164,13 @@ namespace Tortoise.Core
 
             MoveList moveList = new MoveList();
             MoveGen.GenAllMoves(board, ref moveList); // a bit of time is wasted generating non-capture moves
+            MoveOrderer.OrderMoves(ref board, ref moveList);
             Board tempBoard = board;
 
             for (int i = 0; i < moveList.Length; i++)
             {
                 Move move = new Move(moveList.Moves[i]);
-                if ((move.flag & (MoveFlag.Capture | MoveFlag.EnPassant)) != 0)
+                if ((move.flag & MoveFlag.Capture) != 0)
                 {
                     tempBoard = board;
                     tempBoard.MakeMove(move); // flips whose turn it is to move
@@ -196,6 +189,10 @@ namespace Tortoise.Core
                     {
                         return bestSoFar;
                     }
+                }
+                else 
+                {
+                    return bestSoFar;
                 }
             }
 
