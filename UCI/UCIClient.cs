@@ -23,11 +23,11 @@ namespace Tortoise.UCI
 
         public void Run()
         {
-            Console.WriteLine("id name CarrotzDestroyer");
+            Console.WriteLine("id name Tortoise");
             Console.WriteLine("id author ElectricTortoise");
 
-            Console.WriteLine("option name Threads type spin default 1 min 1 max 1");
-            Console.WriteLine("option name Hash type spin default 1 min 1 max 1");
+            PrintUCIOptions();
+            ProcessDefaultUCIOptions();
 
             Console.WriteLine("uciok");
             InputLoop();
@@ -59,13 +59,29 @@ namespace Tortoise.UCI
                 {
                     Environment.Exit(0);
                 }
-                else if (cmd == "isready")
+                else if (cmd == "setoption")
                 {
-                    Console.WriteLine("readyok");
+                    // param[0] = "name"
+                    string optionName = param[1];
+                    string optionValue;
+                    if (param.Length >= 4)
+                    {
+                        optionValue = param[3];
+                    }
+                    else
+                    {
+                        optionValue = " ";
+                    }
+                    HandleSetOption(optionName, optionValue);
                 }
                 else if (cmd == "ucinewgame")
                 {
                     Search.RepetitionHistory.Clear(); 
+                    Search.TranspositionTable.Clear();
+                }
+                else if (cmd == "isready")
+                {
+                    Console.WriteLine("readyok");
                 }
                 else if (cmd == "position")
                 {
@@ -247,6 +263,38 @@ namespace Tortoise.UCI
                 }
             }
             return makeTime;
+        }
+
+        private void PrintUCIOptions()
+        {
+            Console.WriteLine("option name Threads type spin default 1 min 1 max 1");
+            Console.WriteLine("option name Hash type spin default 64 min 1 max 1048576");
+        }
+
+        private void ProcessDefaultUCIOptions()
+        {
+            Search.TranspositionTable = new TranspositionTable(64);
+        }
+
+        private void HandleSetOption(string optionName, string optionValue)
+        {
+            switch (optionName.ToLower())
+            {
+                case "threads":
+                    break;
+                case "hash":
+                    if (int.TryParse(optionValue, out int mb))
+                    {
+                        Search.TranspositionTable = new TranspositionTable(mb);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Error: Invalid Hash Value");
+                    }
+                    break;
+                default:
+                    break;
+            }
         }
     }
 }

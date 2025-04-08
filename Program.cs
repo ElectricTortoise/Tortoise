@@ -24,7 +24,7 @@ namespace Tortoise
             //Board board = new Board();
             //MoveList moveList = new MoveList();
 
-            //board.LoadPosition("r3k2r/p1ppqpb1/bnN1p1p1/3P4/1p2n1Q1/P1N5/1PPBBPpP/R3K2R b KQkq - 0 3");
+            //board.LoadPosition("2k5/6p1/8/p7/1r6/K7/8/8 w - - 98 55");
 
             //MoveGen.GenAllMoves(board, ref moveList);
             //MoveOrderer.OrderMoves(ref board, ref moveList);
@@ -36,6 +36,8 @@ namespace Tortoise
             //{
             //    Console.WriteLine($"{Utility.MoveToString(new Move(moveList.Moves[i]))}, {new Move(moveList.Moves[i]).flag}");
             //}
+
+            Console.WriteLine(sizeof(TTEntry));
 
             DoInputLoop();
         }

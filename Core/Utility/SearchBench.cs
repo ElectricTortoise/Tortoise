@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Tortoise.UCI;
 
 namespace Tortoise.Core
 {
@@ -11,6 +12,7 @@ namespace Tortoise.Core
     {
         public static void Go(int depth = 12)
         {
+            Search.TranspositionTable = new TranspositionTable(64);
             Stopwatch sw = Stopwatch.StartNew();
             Board board = new Board();
 
@@ -19,7 +21,7 @@ namespace Tortoise.Core
                 board.Clear();
                 board.LoadPosition(fen);
                 SearchInformation searchInformation = new SearchInformation(board);
-                Search.NegaMax(board, ref searchInformation, depth, 0, SearchConstants.AlphaStart, SearchConstants.BetaStart);
+                Search.NegaMax(board, ref searchInformation, depth, 0, -EvaluationConstants.ScoreInfinite, EvaluationConstants.ScoreInfinite);
             }
             sw.Stop();
 

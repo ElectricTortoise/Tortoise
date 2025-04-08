@@ -47,5 +47,11 @@ namespace Tortoise.Core
 
             return $"{startSquare}{finalSquare}{flag}";
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static string MoveToString(ushort move)
+        {
+            return MoveToString(new Move(move));
+        }
     }
 }
