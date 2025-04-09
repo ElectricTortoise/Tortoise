@@ -125,9 +125,9 @@ namespace Tortoise.UCI
 
                 flag = MoveFlag.Default;
 
-                if (Utility.IsBitOnBitboard(board.allPieceBitboard, finalSquare)) 
+                if (Utility.IsBitOnBitboard(board.allPieceBitboard, finalSquare))
                 {
-                    flag = MoveFlag.Capture; 
+                    flag = MoveFlag.Capture;
                 } //capture
 
 
@@ -143,7 +143,7 @@ namespace Tortoise.UCI
                     };
                 } // promotion
 
-                if ((startSquare == BoardConstants.e1 && board.kingSquares[Colour.White] == BoardConstants.e1) || (startSquare == BoardConstants.e8 && board.kingSquares[Colour.Black] == BoardConstants.e8)) 
+                if ((startSquare == BoardConstants.e1 && board.kingSquares[Colour.White] == BoardConstants.e1) || (startSquare == BoardConstants.e8 && board.kingSquares[Colour.Black] == BoardConstants.e8))
                 {
                     bool kingSide = board.boardState.whiteToMove ? board.boardState.whiteKingCastle : board.boardState.blackKingCastle;
                     bool queenSide = board.boardState.whiteToMove ? board.boardState.whiteQueenCastle : board.boardState.blackQueenCastle;
