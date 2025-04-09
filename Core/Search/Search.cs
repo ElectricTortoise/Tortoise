@@ -73,7 +73,7 @@ namespace Tortoise.Core
                 {
                     if (board.zobristHash == hash) { repeatedMoves++; }
                 }
-                if (repeatedMoves >= 3 || board.boardState.halfmoveClock >= 100)
+                if (repeatedMoves >= 3) //board.boardState.halfmoveClock >= 100
                 {
                     return EvaluationConstants.ScoreDraw;
                 }
