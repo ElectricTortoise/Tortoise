@@ -72,6 +72,7 @@ namespace Tortoise.Core
         public const int f1 = 61;
         public const int g1 = 62;
         public const int h1 = 63;
+        public const int NONE_SQUARE = 64;
 
         public const ulong rank8 = 0xffUL;
         public const ulong rank7 = 0xff00UL;
@@ -90,7 +91,5 @@ namespace Tortoise.Core
         public const ulong fileF = 0x2020202020202020UL;
         public const ulong fileG = 0x4040404040404040UL;
         public const ulong fileH = 0x8080808080808080UL;
-
-        public const int NONE_SQUARE = 64;
     }
 }

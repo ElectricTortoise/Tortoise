@@ -26,7 +26,7 @@ namespace Tortoise.Core
             MoveGen.GenAllMoves(board, ref moveList);
             for (int i = 0; i < moveList.Length; i++)
             {
-                Move move = new Move(moveList.Moves[i]);
+                ushort move = moveList.Moves[i];
                 Board tempBoard = board;
                 tempBoard.MakeMove(move); // flips whose turn it is to move
 
@@ -51,7 +51,7 @@ namespace Tortoise.Core
             for (int node = 0; node < moveList.Length; node++) 
             {
                 Board tempBoard = board;
-                Move move = new Move(moveList.Moves[node]);
+                ushort move = moveList.Moves[node];
                 tempBoard.MakeMove(move); // flips whose turn it is to move
 
                 int kingSquare = tempBoard.kingSquares[tempBoard.boardState.GetOpponentColour()]; // original player's king square
@@ -132,7 +132,7 @@ namespace Tortoise.Core
             MoveGen.GenAllMoves(board, ref moveList);
             for (int i = 0; i < moveList.Length; i++)
             {
-                Move move = new Move(moveList.Moves[i]);
+                ushort move = moveList.Moves[i];
                 Board tempBoard = board;
                 tempBoard.MakeMove(move); // flips whose turn it is to move
 

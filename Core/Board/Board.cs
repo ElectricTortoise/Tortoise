@@ -23,6 +23,11 @@ namespace Tortoise.Core
             boardState = new BoardState();
         }
 
+        public void MakeMove(ushort move)
+        {
+            MakeMove(new Move(move));
+        }
+
         public void MakeMove(Move move)
         {
             int myPieceColour = this.boardState.whiteToMove ? Colour.White : Colour.Black;
@@ -30,21 +35,18 @@ namespace Tortoise.Core
             int kingSquare = kingSquares[myPieceColour];
             int myPieceType = pieceTypesBitboard[move.StartSquare];
 
+            this.boardState.halfmoveClock++;
+
             if (myPieceType == PieceType.King)
             {
                 kingSquare = move.FinalSquare;
                 kingSquares[myPieceColour] = kingSquare;
-                //if (this.boardState.whiteToMove) { this.boardState.DisableWhiteCastling(); }
-                //else { this.boardState.DisableBlackCastling(); }
             }
 
-            //if (myPieceType == PieceType.Rook)
-            //{
-            //    if (this.boardState.whiteToMove && move.StartSquare == 63) { this.boardState.DisableWhiteKingCastling(); }
-            //    else if (this.boardState.whiteToMove && move.StartSquare == 56) { this.boardState.DisableWhiteQueenCastling(); }
-            //    else if (!this.boardState.whiteToMove && move.StartSquare == 7) { this.boardState.DisableBlackKingCastling(); }
-            //    else if (!this.boardState.whiteToMove && move.StartSquare == 0) { this.boardState.DisableBlackQueenCastling(); }
-            //}
+            if (myPieceType == PieceType.Pawn)
+            {
+                this.boardState.halfmoveClock = 0;
+            }
 
             int targetPieceType;
 
@@ -65,6 +67,7 @@ namespace Tortoise.Core
                     break;
 
                 case MoveFlag.Capture:
+                    this.boardState.halfmoveClock = 0;
                     targetPieceType = pieceTypesBitboard[move.FinalSquare];
                     RemovePiece(targetPieceType, opponentPieceColour, move.FinalSquare);
                     AddPiece(myPieceType, myPieceColour, move.FinalSquare);

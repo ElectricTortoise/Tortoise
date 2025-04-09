@@ -65,11 +65,7 @@ namespace Tortoise.Core
         /// </summary>
         public void MakeMoveTime()
         {
-            int newSearchTime = (PlayerIncrement / 2) + (PlayerTime / 20);
-
-            newSearchTime = Math.Min(newSearchTime, PlayerTime);
-
-            MaxSearchTime = newSearchTime;
+            MaxSearchTime = (PlayerIncrement / 2) + (PlayerTime / 20);
         }
     }
 }

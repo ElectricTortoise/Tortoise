@@ -8,8 +8,8 @@ namespace Tortoise.Core
 {
     public class EvaluationConstants
     {
-        public const int ScoreInfinite = 1000000;
-        public const int ScoreMate = 999999;
-        public const int ScoreDraw = 0;
+        public const short ScoreInfinite = 32000;
+        public const short ScoreMate = 31999;
+        public const short ScoreDraw = 0;
     }
 }

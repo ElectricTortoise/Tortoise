@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO.IsolatedStorage;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -12,41 +13,47 @@ namespace Tortoise.Core
 {
     public static unsafe class Search
     {
+        public static Stack<ulong> RepetitionHistory;
+
         public static int NodesCounter;
 
         private static bool SearchCompleted;
-        private static int TempBestScore;
-        private static Move TempBestMove;
-        public static int BestScore;
-        public static Move BestMove;
+        private static int BestScore;
+        private static ushort BestMove;
+        public static int RootBestScore;
+        public static ushort RootBestMove;
 
+        static Search()
+        {
+            RepetitionHistory = new Stack<ulong>();
+        }
 
         public static void StartSearch(Board board, ref SearchInformation info)
         {
             string move = "";
             info.SearchActive = true;
             NodesCounter = 0;
-            BestScore = 0;
+            RootBestScore = 0;
 
             TimeManager.TotalSearchTime.Start();
             for (int searchDepth = 1; searchDepth < info.DepthLimit + 1; searchDepth++)
             {
-                BestScore = NegaMax(board, ref info, searchDepth, 0, SearchConstants.AlphaStart, SearchConstants.BetaStart);
+                RootBestScore = NegaMax(board, ref info, searchDepth, 0, -EvaluationConstants.ScoreInfinite, EvaluationConstants.ScoreInfinite);
                 if (SearchCompleted)
                 {
-                    BestMove = TempBestMove;
+                    RootBestMove = BestMove;
                 }
 
                 long timeInMS = TimeManager.TotalSearchTime.ElapsedMilliseconds;
                 int nps = (int)((NodesCounter / Math.Max(1, timeInMS)) * 1000);
-                move = Utility.MoveToString(BestMove);
+                move = Utility.MoveToString(RootBestMove);
 
                 if (info.TimeManager.CheckTime())
                 {
                     break;
                 }
 
-                Console.WriteLine($"info depth {searchDepth} time {timeInMS} score cp {BestScore} nodes {NodesCounter} nps {nps} pv {move}");
+                Console.WriteLine($"info depth {searchDepth} time {timeInMS} score cp {RootBestScore} nodes {NodesCounter} nps {nps} pv {move}");
             }
 
             TimeManager.TotalSearchTime.Reset();
@@ -58,14 +65,26 @@ namespace Tortoise.Core
         public static int NegaMax(Board board, ref SearchInformation info, int depth, int ply, int alpha, int beta)
         {
             SearchCompleted = true;
-            
 
-            if (depth == 0)
+            int repeatedMoves = 0;
+            if (ply != 0) //To-do: implement twofold detection for post-root, threefold detection for pre-root and skip every other move (since I cannot play my opponent's moves)
+            {
+                foreach (ulong hash in RepetitionHistory)
+                {
+                    if (board.zobristHash == hash) { repeatedMoves++; }
+                }
+                if (repeatedMoves >= 3 || board.boardState.halfmoveClock >= 100)
+                {
+                    return EvaluationConstants.ScoreDraw;
+                }
+            }
+
+            if (depth <= 0)
             {
                 return Quiesce(board, alpha, beta);
             }
 
-            int bestSoFar = SearchConstants.AlphaStart;
+            int bestSoFar = -EvaluationConstants.ScoreInfinite;
             int legalMoves = 0;
             MoveList moveList = new MoveList();
             MoveGen.GenAllMoves(board, ref moveList);
@@ -75,7 +94,7 @@ namespace Tortoise.Core
 
             for (int i = 0; i < moveList.Length; i++)
             {
-                Move move = new Move(moveList.Moves[i]);
+                ushort move = moveList.Moves[i];
                 tempBoard = board;
                 tempBoard.MakeMove(move); // flips whose turn it is to move
 
@@ -84,26 +103,28 @@ namespace Tortoise.Core
                 {
                     continue;
                 }
+
                 NodesCounter++;
                 legalMoves++;
 
+                RepetitionHistory.Push(tempBoard.zobristHash);
                 bestSoFar = Math.Max(bestSoFar, -NegaMax(tempBoard, ref info, depth - 1, ply + 1, -beta, -alpha));
+                RepetitionHistory.Pop();
 
-                if (alpha < bestSoFar)
+                if (bestSoFar > alpha)
                 {
                     alpha = bestSoFar;
                     if (ply == 0 && bestSoFar >= alpha)
                     {
-                        TempBestScore = bestSoFar;
-                        TempBestMove = move;
+                        BestScore = bestSoFar;
+                        BestMove = move;
                     }
                 }
 
-                if (beta <= bestSoFar)
+                if (bestSoFar >= beta)
                 {
-                    return bestSoFar;
+                    break;
                 }
-
 
                 if (info.TimeManager.CheckTime())
                 {
@@ -121,7 +142,7 @@ namespace Tortoise.Core
                 }
                 else
                 {
-                    return 0;
+                    return EvaluationConstants.ScoreDraw;
                 }
             }
 
@@ -134,7 +155,7 @@ namespace Tortoise.Core
             int standPat = Evaluation.Evaluate(board);
             int bestSoFar = standPat;
             alpha = Math.Max(alpha, standPat);
-            if (beta <= standPat)
+            if (standPat >= beta)
             {
                 return standPat;
             }
@@ -142,12 +163,13 @@ namespace Tortoise.Core
             MoveList moveList = new MoveList();
             MoveGen.GenAllMoves(board, ref moveList); // a bit of time is wasted generating non-capture moves
             MoveOrderer.OrderMoves(ref board, ref moveList);
+
             Board tempBoard;
 
             for (int i = 0; i < moveList.Length; i++)
             {
-                Move move = new Move(moveList.Moves[i]);
-                if ((move.flag & MoveFlag.Capture) != 0)
+                ushort move = moveList.Moves[i];
+                if ((new Move(move).flag & MoveFlag.Capture) != 0)
                 {
                     tempBoard = board;
                     tempBoard.MakeMove(move); // flips whose turn it is to move
@@ -163,7 +185,11 @@ namespace Tortoise.Core
 
                     bestSoFar = Math.Max(bestSoFar, -Quiesce(tempBoard, -beta, -alpha));
                     alpha = Math.Max(alpha, bestSoFar);
-                    if (beta <= bestSoFar)
+                    if (bestSoFar > alpha)
+                    {
+                        alpha = bestSoFar;
+                    }
+                    if (bestSoFar >= beta)
                     {
                         return bestSoFar;
                     }
