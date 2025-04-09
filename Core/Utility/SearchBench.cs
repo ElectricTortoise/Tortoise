@@ -12,7 +12,6 @@ namespace Tortoise.Core
     {
         public static void Go(int depth = 12)
         {
-            Search.TranspositionTable = new TranspositionTable(64);
             Stopwatch sw = Stopwatch.StartNew();
             Board board = new Board();
 

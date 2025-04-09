@@ -27,7 +27,6 @@ namespace Tortoise.UCI
             Console.WriteLine("id author ElectricTortoise");
 
             PrintUCIOptions();
-            ProcessDefaultUCIOptions();
 
             Console.WriteLine("uciok");
             InputLoop();
@@ -72,12 +71,10 @@ namespace Tortoise.UCI
                     {
                         optionValue = " ";
                     }
-                    HandleSetOption(optionName, optionValue);
                 }
                 else if (cmd == "ucinewgame")
                 {
                     Search.RepetitionHistory.Clear(); 
-                    Search.TranspositionTable.Clear();
                 }
                 else if (cmd == "isready")
                 {
@@ -269,32 +266,6 @@ namespace Tortoise.UCI
         {
             Console.WriteLine("option name Threads type spin default 1 min 1 max 1");
             Console.WriteLine("option name Hash type spin default 64 min 1 max 1048576");
-        }
-
-        private void ProcessDefaultUCIOptions()
-        {
-            Search.TranspositionTable = new TranspositionTable(64);
-        }
-
-        private void HandleSetOption(string optionName, string optionValue)
-        {
-            switch (optionName.ToLower())
-            {
-                case "threads":
-                    break;
-                case "hash":
-                    if (int.TryParse(optionValue, out int mb))
-                    {
-                        Search.TranspositionTable = new TranspositionTable(mb);
-                    }
-                    else
-                    {
-                        Console.WriteLine("Error: Invalid Hash Value");
-                    }
-                    break;
-                default:
-                    break;
-            }
         }
     }
 }

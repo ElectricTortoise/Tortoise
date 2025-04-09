@@ -15,8 +15,6 @@ namespace Tortoise.Core
     {
         public static Stack<ulong> RepetitionHistory;
 
-        public static TranspositionTable TranspositionTable;
-
         public static int NodesCounter;
 
         private static bool SearchCompleted;
@@ -40,19 +38,10 @@ namespace Tortoise.Core
             TimeManager.TotalSearchTime.Start();
             for (int searchDepth = 1; searchDepth < info.DepthLimit + 1; searchDepth++)
             {
-                int hashFullness = 0;
                 RootBestScore = NegaMax(board, ref info, searchDepth, 0, -EvaluationConstants.ScoreInfinite, EvaluationConstants.ScoreInfinite);
                 if (SearchCompleted)
                 {
                     RootBestMove = BestMove;
-                }
-
-                for (int i = 0; i < 1000; i++)
-                {
-                    if (TranspositionTable.entries[i].zobristHash != 0)
-                    {
-                        hashFullness++;
-                    }
                 }
 
                 long timeInMS = TimeManager.TotalSearchTime.ElapsedMilliseconds;
@@ -64,7 +53,7 @@ namespace Tortoise.Core
                     break;
                 }
 
-                Console.WriteLine($"info depth {searchDepth} time {timeInMS} score cp {RootBestScore} nodes {NodesCounter} nps {nps} hashfull {hashFullness} pv {move}");
+                Console.WriteLine($"info depth {searchDepth} time {timeInMS} score cp {RootBestScore} nodes {NodesCounter} nps {nps} pv {move}");
             }
 
             TimeManager.TotalSearchTime.Reset();
@@ -77,27 +66,8 @@ namespace Tortoise.Core
         {
             SearchCompleted = true;
 
-            ulong TTIndex = board.zobristHash % (uint)TranspositionTable.entries.Length;
-            TTEntry entry = TranspositionTable.entries[TTIndex];
-            if (ply != 0)
-            {
-                if (entry.zobristHash == board.zobristHash)
-                {
-                    if (entry.depth >= depth)
-                    {
-                        var entryBound = entry.type & TranspositionTable.TT_BOUND_MASK;
-                        if ((entryBound == SearchConstants.NodeBoundExact) ||
-                           ((entryBound == SearchConstants.NodeBoundUpper) && (entry.score <= alpha)) ||
-                           ((entryBound == SearchConstants.NodeBoundLower) && (entry.score >= beta)))
-                        {
-                            return entry.score;
-                        }
-                    }
-                }
-            }
-
             int repeatedMoves = 0;
-            if (ply != 0) //implement twofold detection for post-root, threefold detection for pre-root and skip every other move (since I cannot play my opponent's moves)
+            if (ply != 0) //To-do: implement twofold detection for post-root, threefold detection for pre-root and skip every other move (since I cannot play my opponent's moves)
             {
                 foreach (ulong hash in RepetitionHistory)
                 {
@@ -121,9 +91,6 @@ namespace Tortoise.Core
             MoveOrderer.OrderMoves(ref board, ref moveList);
 
             Board tempBoard;
-            ushort bestMove = SearchConstants.NullMove;
-            byte nodeBound = SearchConstants.NodeBoundExact;
-            byte nodeType = SearchConstants.NodeTypeNull;
 
             for (int i = 0; i < moveList.Length; i++)
             {
@@ -146,7 +113,6 @@ namespace Tortoise.Core
 
                 if (bestSoFar > alpha)
                 {
-                    bestMove = move;
                     alpha = bestSoFar;
                     if (ply == 0 && bestSoFar >= alpha)
                     {
@@ -157,7 +123,6 @@ namespace Tortoise.Core
 
                 if (bestSoFar >= beta)
                 {
-                    nodeBound = SearchConstants.NodeBoundLower;
                     break;
                 }
 
@@ -181,42 +146,17 @@ namespace Tortoise.Core
                 }
             }
 
-            if (bestMove == SearchConstants.NullMove)
-            {
-                nodeBound = SearchConstants.NodeBoundUpper;
-            }
-
-            nodeType |= nodeBound;
-
-            TranspositionTable.Add(board.zobristHash, new TTEntry(board.zobristHash, bestMove, (short)bestSoFar, (byte)depth, nodeType));
-
             return bestSoFar;
         }
 
         public static int Quiesce(Board board, int alpha, int beta)
         {
-            //ulong TTIndex = board.zobristHash % (uint)TranspositionTable.entries.Length;
-            //TTEntry entry = TranspositionTable.entries[TTIndex];
-            //if (entry.zobristHash == board.zobristHash)
-            //{
-            //    if (entry.depth >= 0)
-            //    {
-            //        if (((entry.type & TranspositionTable.TT_BOUND_MASK) == SearchConstants.NodeBoundExact) ||
-            //            (((entry.type & TranspositionTable.TT_BOUND_MASK) == SearchConstants.NodeBoundUpper) && (entry.score <= alpha)) ||
-            //            (((entry.type & TranspositionTable.TT_BOUND_MASK) == SearchConstants.NodeBoundLower) && (entry.score >= beta)))
-            //        {
-            //            return entry.score;
-            //        }
-            //    }
-            //}
-
             //return if position is worse beta, else increase alpha to position value
             int standPat = Evaluation.Evaluate(board);
             int bestSoFar = standPat;
             alpha = Math.Max(alpha, standPat);
             if (standPat >= beta)
             {
-                TranspositionTable.Add(board.zobristHash, new TTEntry(board.zobristHash, SearchConstants.NullMove, (short)bestSoFar, 0, SearchConstants.NodeBoundNone));
                 return standPat;
             }
 
@@ -225,9 +165,6 @@ namespace Tortoise.Core
             MoveOrderer.OrderMoves(ref board, ref moveList);
 
             Board tempBoard;
-            ushort bestMove = SearchConstants.NullMove;
-            byte nodeBound = SearchConstants.NodeBoundExact;
-            byte nodeType = SearchConstants.NodeTypeNull;
 
             for (int i = 0; i < moveList.Length; i++)
             {
@@ -250,12 +187,10 @@ namespace Tortoise.Core
                     alpha = Math.Max(alpha, bestSoFar);
                     if (bestSoFar > alpha)
                     {
-                        bestMove = move;
                         alpha = bestSoFar;
                     }
                     if (bestSoFar >= beta)
                     {
-                        nodeBound = SearchConstants.NodeBoundLower;
                         return bestSoFar;
                     }
                 }
@@ -264,15 +199,6 @@ namespace Tortoise.Core
                     return bestSoFar;
                 }
             }
-
-            if (bestMove == SearchConstants.NullMove)
-            {
-                nodeBound = SearchConstants.NodeBoundUpper;
-            }
-
-            nodeType |= nodeBound;
-
-            TranspositionTable.Add(board.zobristHash, new TTEntry(board.zobristHash, bestMove, (short)bestSoFar, 0, nodeBound));
 
             return bestSoFar;
         }
