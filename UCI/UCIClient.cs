@@ -65,7 +65,7 @@ namespace Tortoise.UCI
                 }
                 else if (cmd == "ucinewgame")
                 {
-                    Search.RepetitionHistory.Clear(); 
+                    continue;
                 }
                 else if (cmd == "position")
                 {
@@ -93,9 +93,6 @@ namespace Tortoise.UCI
             {
                 board.LoadStartingPosition();
             }
-
-            Search.RepetitionHistory.Clear();
-            Search.RepetitionHistory.Push(board.zobristHash);
 
             var moves = input.SkipWhile(x => x != "moves").Skip(1).ToArray();
 
@@ -166,8 +163,6 @@ namespace Tortoise.UCI
                 {
                     continue;
                 }
-
-                Search.RepetitionHistory.Push(board.zobristHash);
             }
 
             info = new SearchInformation(board);

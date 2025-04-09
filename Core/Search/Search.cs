@@ -12,8 +12,6 @@ namespace Tortoise.Core
 {
     public static unsafe class Search
     {
-        public static Stack<ulong> RepetitionHistory;
-
         public static int NodesCounter;
 
         private static bool SearchCompleted;
@@ -22,10 +20,6 @@ namespace Tortoise.Core
         public static int BestScore;
         public static Move BestMove;
 
-        static Search()
-        {
-            RepetitionHistory = new Stack<ulong>();
-        }
 
         public static void StartSearch(Board board, ref SearchInformation info)
         {
@@ -81,7 +75,6 @@ namespace Tortoise.Core
 
             for (int i = 0; i < moveList.Length; i++)
             {
-                int repeatedMoves = 0;
                 Move move = new Move(moveList.Moves[i]);
                 tempBoard = board;
                 tempBoard.MakeMove(move); // flips whose turn it is to move
@@ -91,22 +84,10 @@ namespace Tortoise.Core
                 {
                     continue;
                 }
-                RepetitionHistory.Push(tempBoard.zobristHash);
                 NodesCounter++;
                 legalMoves++;
 
-                foreach (ulong hash in RepetitionHistory)
-                {
-                    if (tempBoard.zobristHash == hash) { repeatedMoves++; }
-                }
-                if (repeatedMoves >= 3)
-                {
-                    bestSoFar = Math.Max(bestSoFar, 0);
-                }
-                else
-                {
-                    bestSoFar = Math.Max(bestSoFar, -NegaMax(tempBoard, ref info, depth - 1, ply + 1, -beta, -alpha));
-                }
+                bestSoFar = Math.Max(bestSoFar, -NegaMax(tempBoard, ref info, depth - 1, ply + 1, -beta, -alpha));
 
                 if (alpha < bestSoFar)
                 {
@@ -120,7 +101,6 @@ namespace Tortoise.Core
 
                 if (beta <= bestSoFar)
                 {
-                    RepetitionHistory.Pop();
                     return bestSoFar;
                 }
 
@@ -130,8 +110,6 @@ namespace Tortoise.Core
                     SearchCompleted = false;
                     break;
                 }
-
-                RepetitionHistory.Pop();
             }
 
             if (legalMoves == 0)
