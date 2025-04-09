@@ -195,20 +195,20 @@ namespace Tortoise.Core
 
         public static int Quiesce(Board board, int alpha, int beta)
         {
-            ulong TTIndex = board.zobristHash % (uint)TranspositionTable.entries.Length;
-            TTEntry entry = TranspositionTable.entries[TTIndex];
-            if (entry.zobristHash == board.zobristHash)
-            {
-                if (entry.depth >= 0)
-                {
-                    if (((entry.type & TranspositionTable.TT_BOUND_MASK) == SearchConstants.NodeBoundExact) ||
-                        (((entry.type & TranspositionTable.TT_BOUND_MASK) == SearchConstants.NodeBoundUpper) && (entry.score <= alpha)) ||
-                        (((entry.type & TranspositionTable.TT_BOUND_MASK) == SearchConstants.NodeBoundLower) && (entry.score >= beta)))
-                    {
-                        return entry.score;
-                    }
-                }
-            }
+            //ulong TTIndex = board.zobristHash % (uint)TranspositionTable.entries.Length;
+            //TTEntry entry = TranspositionTable.entries[TTIndex];
+            //if (entry.zobristHash == board.zobristHash)
+            //{
+            //    if (entry.depth >= 0)
+            //    {
+            //        if (((entry.type & TranspositionTable.TT_BOUND_MASK) == SearchConstants.NodeBoundExact) ||
+            //            (((entry.type & TranspositionTable.TT_BOUND_MASK) == SearchConstants.NodeBoundUpper) && (entry.score <= alpha)) ||
+            //            (((entry.type & TranspositionTable.TT_BOUND_MASK) == SearchConstants.NodeBoundLower) && (entry.score >= beta)))
+            //        {
+            //            return entry.score;
+            //        }
+            //    }
+            //}
 
             //return if position is worse beta, else increase alpha to position value
             int standPat = Evaluation.Evaluate(board);

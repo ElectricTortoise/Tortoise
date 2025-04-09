@@ -37,8 +37,6 @@ namespace Tortoise
             //    Console.WriteLine($"{Utility.MoveToString(new Move(moveList.Moves[i]))}, {new Move(moveList.Moves[i]).flag}");
             //}
 
-            Console.WriteLine(sizeof(TTEntry));
-
             DoInputLoop();
         }
 
