@@ -24,7 +24,7 @@ namespace Tortoise
             //Board board = new Board();
             //MoveList moveList = new MoveList();
 
-            //board.LoadPosition("2k5/6p1/8/p7/1r6/K7/8/8 w - - 98 55");
+            //board.LoadPosition("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1");
 
             //MoveGen.GenAllMoves(board, ref moveList);
             //MoveOrderer.OrderMoves(ref board, ref moveList);
@@ -36,7 +36,7 @@ namespace Tortoise
             //{
             //    Console.WriteLine($"{Utility.MoveToString(new Move(moveList.Moves[i]))}, {new Move(moveList.Moves[i]).flag}");
             //}
-
+ 
             DoInputLoop();
         }
 
@@ -55,6 +55,12 @@ namespace Tortoise
                 {
                     UCIClient client = new UCIClient();
                     client.Run();
+                }
+
+                if (param[0].ToLower() == "bench")
+                {
+                    int.TryParse(param[1], out int depth);
+                    SearchBench.Go(depth);
                 }
             }
         }

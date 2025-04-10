@@ -113,20 +113,17 @@ namespace Tortoise.Core
 
         public static bool ZobristPerft(Board board, int depth)
         {
-            bool pass = true;
             MoveList moveList = new MoveList();
 
             if (depth == 0)
             {
-                pass = (Zobrist.GetZobristHash(board) == board.zobristHash);
-
-                if (!pass)
+                if (!(Zobrist.GetZobristHash(board) == board.zobristHash))
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine($"True hash -> 0x{Zobrist.GetZobristHash(board).ToString("x").PadRight(20, ' ')}   Current hash -> 0x{board.zobristHash.ToString("x").PadRight(20, ' ')}   Difference 0x{(Zobrist.GetZobristHash(board) ^ board.zobristHash).ToString("x")}");
-                    pass = false;
+                    return false;
                 }
-                return pass;
+                return true;
             }
 
             MoveGen.GenAllMoves(board, ref moveList);
@@ -142,20 +139,20 @@ namespace Tortoise.Core
                     continue;
                 }
 
-                bool tempPass = (Zobrist.GetZobristHash(board) == board.zobristHash);
-                if (!tempPass)
+                if (!(Zobrist.GetZobristHash(tempBoard) == tempBoard.zobristHash))
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine($"True hash -> 0x{Zobrist.GetZobristHash(tempBoard).ToString("x").PadRight(20, ' ')}   Current hash -> 0x{tempBoard.zobristHash.ToString("x").PadRight(20, ' ')}   Difference 0x{(Zobrist.GetZobristHash(tempBoard) ^ tempBoard.zobristHash).ToString("x")}");
-                    pass = false;
-                    continue;
+                    return false;
                 }
 
-                tempPass = ZobristPerft(tempBoard, depth - 1);
-                if (!tempPass) { pass = false; }
+                if (!(ZobristPerft(tempBoard, depth - 1)))
+                {
+                    return false;
+                }
             }
 
-            return pass;
+            return true;
         }
 
         public static void DividedZobristPerft(Board board, int depth)

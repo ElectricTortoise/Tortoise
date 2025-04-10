@@ -25,7 +25,15 @@ namespace Tortoise.Core
 
         public override string ToString()
         {
-            return $"hash {zobristHash} \nmove {move} \nscore {score} \ndepth {depth} \ntype {type} \n";
+            string typeName = type switch
+            {
+                SearchConstants.NodeBoundNone => "N",
+                SearchConstants.NodeBoundLower => "L",
+                SearchConstants.NodeBoundUpper => "U",
+                SearchConstants.NodeBoundExact => "E",
+                _ => ""
+            };
+            return $"hash {zobristHash} \nmove {move} \nscore {score} \ndepth {depth} \ntype {typeName} \n";
         }
     }
 }

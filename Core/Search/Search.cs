@@ -77,6 +77,19 @@ namespace Tortoise.Core
         {
             SearchCompleted = true;
 
+            int repeatedMoves = 0;
+            if (ply != 0) //implement twofold detection for post-root, threefold detection for pre-root and skip every other move (since I cannot play my opponent's moves)
+            {
+                foreach (ulong hash in RepetitionHistory)
+                {
+                    if (board.zobristHash == hash) { repeatedMoves++; }
+                }
+                if (repeatedMoves >= 3 || board.boardState.halfmoveClock >= 100)
+                {
+                    return EvaluationConstants.ScoreDraw;
+                }
+            }
+
             ulong TTIndex = board.zobristHash % (uint)TranspositionTable.entries.Length;
             TTEntry entry = TranspositionTable.entries[TTIndex];
             if (ply != 0)
@@ -96,19 +109,6 @@ namespace Tortoise.Core
                 }
             }
 
-            int repeatedMoves = 0;
-            if (ply != 0) //implement twofold detection for post-root, threefold detection for pre-root and skip every other move (since I cannot play my opponent's moves)
-            {
-                foreach (ulong hash in RepetitionHistory)
-                {
-                    if (board.zobristHash == hash) { repeatedMoves++; }
-                }
-                if (repeatedMoves >= 3 || board.boardState.halfmoveClock >= 100)
-                {
-                    return EvaluationConstants.ScoreDraw;
-                }
-            }
-
             if (depth <= 0)
             {
                 return Quiesce(board, alpha, beta);
@@ -122,7 +122,7 @@ namespace Tortoise.Core
 
             Board tempBoard;
             ushort bestMove = SearchConstants.NullMove;
-            byte nodeBound = SearchConstants.NodeBoundExact;
+            byte nodeBound = SearchConstants.NodeBoundUpper;
 
             for (int i = 0; i < moveList.Length; i++)
             {
@@ -147,6 +147,7 @@ namespace Tortoise.Core
                 {
                     bestMove = move;
                     alpha = bestSoFar;
+                    nodeBound = SearchConstants.NodeBoundExact;
                     if (ply == 0 && bestSoFar >= alpha)
                     {
                         BestScore = bestSoFar;
@@ -178,11 +179,6 @@ namespace Tortoise.Core
                 {
                     return EvaluationConstants.ScoreDraw;
                 }
-            }
-
-            if (bestMove == SearchConstants.NullMove)
-            {
-                nodeBound = SearchConstants.NodeBoundUpper;
             }
 
             TranspositionTable.Add(board.zobristHash, new TTEntry(board.zobristHash, bestMove, (short)bestSoFar, (byte)depth, nodeBound));
