@@ -123,7 +123,6 @@ namespace Tortoise.Core
             Board tempBoard;
             ushort bestMove = SearchConstants.NullMove;
             byte nodeBound = SearchConstants.NodeBoundExact;
-            byte nodeType = SearchConstants.NodeTypeNull;
 
             for (int i = 0; i < moveList.Length; i++)
             {
@@ -186,37 +185,19 @@ namespace Tortoise.Core
                 nodeBound = SearchConstants.NodeBoundUpper;
             }
 
-            nodeType |= nodeBound;
-
-            TranspositionTable.Add(board.zobristHash, new TTEntry(board.zobristHash, bestMove, (short)bestSoFar, (byte)depth, nodeType));
+            TranspositionTable.Add(board.zobristHash, new TTEntry(board.zobristHash, bestMove, (short)bestSoFar, (byte)depth, nodeBound));
 
             return bestSoFar;
         }
 
         public static int Quiesce(Board board, int alpha, int beta)
         {
-            //ulong TTIndex = board.zobristHash % (uint)TranspositionTable.entries.Length;
-            //TTEntry entry = TranspositionTable.entries[TTIndex];
-            //if (entry.zobristHash == board.zobristHash)
-            //{
-            //    if (entry.depth >= 0)
-            //    {
-            //        if (((entry.type & TranspositionTable.TT_BOUND_MASK) == SearchConstants.NodeBoundExact) ||
-            //            (((entry.type & TranspositionTable.TT_BOUND_MASK) == SearchConstants.NodeBoundUpper) && (entry.score <= alpha)) ||
-            //            (((entry.type & TranspositionTable.TT_BOUND_MASK) == SearchConstants.NodeBoundLower) && (entry.score >= beta)))
-            //        {
-            //            return entry.score;
-            //        }
-            //    }
-            //}
-
             //return if position is worse beta, else increase alpha to position value
             int standPat = Evaluation.Evaluate(board);
             int bestSoFar = standPat;
             alpha = Math.Max(alpha, standPat);
             if (standPat >= beta)
             {
-                TranspositionTable.Add(board.zobristHash, new TTEntry(board.zobristHash, SearchConstants.NullMove, (short)bestSoFar, 0, SearchConstants.NodeBoundNone));
                 return standPat;
             }
 
@@ -226,8 +207,6 @@ namespace Tortoise.Core
 
             Board tempBoard;
             ushort bestMove = SearchConstants.NullMove;
-            byte nodeBound = SearchConstants.NodeBoundExact;
-            byte nodeType = SearchConstants.NodeTypeNull;
 
             for (int i = 0; i < moveList.Length; i++)
             {
@@ -255,7 +234,6 @@ namespace Tortoise.Core
                     }
                     if (bestSoFar >= beta)
                     {
-                        nodeBound = SearchConstants.NodeBoundLower;
                         return bestSoFar;
                     }
                 }
@@ -264,15 +242,6 @@ namespace Tortoise.Core
                     return bestSoFar;
                 }
             }
-
-            if (bestMove == SearchConstants.NullMove)
-            {
-                nodeBound = SearchConstants.NodeBoundUpper;
-            }
-
-            nodeType |= nodeBound;
-
-            TranspositionTable.Add(board.zobristHash, new TTEntry(board.zobristHash, bestMove, (short)bestSoFar, 0, nodeBound));
 
             return bestSoFar;
         }
