@@ -11,17 +11,17 @@ namespace Tortoise.Core
         public const int TT_BOUND_MASK = 0b11;
 
         public TTEntry[] entries;
-        public int sizeInMiB;
+        public ulong sizeInMiB;
 
-        public TranspositionTable(int mb) 
+        public TranspositionTable(ulong mb) 
         {
             this.sizeInMiB = mb;
             Initialize(mb);
         }
 
-        public void Initialize(int mb)
+        public void Initialize(ulong mb)
         {
-            this.entries = new TTEntry[(mb * 1024 * 1024) / sizeof(TTEntry)];
+            this.entries = new TTEntry[(mb * 1024 * 1024) / (ulong)sizeof(TTEntry)];
         }
 
         ///<summary>
@@ -31,7 +31,7 @@ namespace Tortoise.Core
         {
             //Console.WriteLine(zobristHash % (uint)this.entries.Length);
             //Console.WriteLine(entry);
-            this.entries[zobristHash % (uint)this.entries.Length] = entry;
+            this.entries[zobristHash % (ulong)this.entries.Length] = entry;
         }
 
         public void Clear()

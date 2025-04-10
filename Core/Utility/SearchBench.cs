@@ -27,8 +27,26 @@ namespace Tortoise.Core
 
             int nps = (int)(Search.NodesCounter / sw.Elapsed.TotalSeconds);
             Console.WriteLine($"{Search.NodesCounter} nodes {nps} nps");
-            Search.NodesCounter = 0;
+            Search.SearchNodesCounter = 0;
+            Search.QSearchNodesCounter = 0;
             sw.Reset();
+        }
+
+        public static void SearchPosition(Board board, int depth = SearchConstants.MaxDepth, int searchTime = SearchConstants.MaxSearchTime)
+        {
+            Search.TranspositionTable = new TranspositionTable(64);
+            SearchInformation searchInformation = new SearchInformation(board, depth, searchTime);
+            Search.StartSearch(board, ref searchInformation);
+            float TThitrate = 0;
+            if (Search.TThit == 0)
+            {
+                TThitrate = (float)Search.TThit / Search.SearchNodesCounter;
+            }
+            else
+            {
+                TThitrate = (float)Search.TThit / Search.SearchNodesCounter;
+            }
+            Console.Write($"TThit {Search.TThit} \nTTread {Search.SearchNodesCounter} \nTTsucceed {Search.TTsucceed} \nTThitrate {TThitrate} \n");
         }
 
         private static string[] BenchFENs = new string[]

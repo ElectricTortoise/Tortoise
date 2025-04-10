@@ -36,7 +36,7 @@ namespace Tortoise
             //{
             //    Console.WriteLine($"{Utility.MoveToString(new Move(moveList.Moves[i]))}, {new Move(moveList.Moves[i]).flag}");
             //}
- 
+
             DoInputLoop();
         }
 
@@ -59,8 +59,33 @@ namespace Tortoise
 
                 if (param[0].ToLower() == "bench")
                 {
-                    int.TryParse(param[1], out int depth);
-                    SearchBench.Go(depth);
+                    try
+                    {
+                        bool benchSuite = int.TryParse(param[1], out int depth);
+                        if (benchSuite)
+                        {
+                            SearchBench.Go(depth);
+                        }
+                        else
+                        {
+                            if (param[1] == "fen")
+                            {
+                                Board board = new Board();
+
+                                param = param.Skip(2).ToArray();
+                                string fen = string.Join(" ", param);
+                                board.LoadPosition(fen);
+
+                                Console.Write("Depth: ");
+                                int.TryParse(Console.ReadLine(), out depth);
+                                SearchBench.SearchPosition(board, depth);
+                            }
+                        }
+                    }
+                    catch
+                    {
+                        continue;
+                    }
                 }
             }
         }

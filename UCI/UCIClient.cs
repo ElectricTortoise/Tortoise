@@ -285,7 +285,7 @@ namespace Tortoise.UCI
                 case "hash":
                     if (int.TryParse(optionValue, out int mb))
                     {
-                        Search.TranspositionTable = new TranspositionTable(mb);
+                        Search.TranspositionTable = new TranspositionTable((ulong)mb);
                     }
                     else
                     {

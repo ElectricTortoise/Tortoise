@@ -17,7 +17,12 @@ namespace Tortoise.Core
 
         public static TranspositionTable TranspositionTable;
 
-        public static int NodesCounter;
+        //for debugging
+        public static int TThit;
+        public static int TTsucceed;
+        public static int SearchNodesCounter;
+        public static int QSearchNodesCounter;
+        public static int NodesCounter => SearchNodesCounter + QSearchNodesCounter;
 
         private static bool SearchCompleted;
         private static int BestScore;
@@ -34,37 +39,49 @@ namespace Tortoise.Core
         {
             string move = "";
             info.SearchActive = true;
-            NodesCounter = 0;
             RootBestScore = 0;
 
             TimeManager.TotalSearchTime.Start();
-            for (int searchDepth = 1; searchDepth < info.DepthLimit + 1; searchDepth++)
+            try
             {
-                int hashFullness = 0;
-                RootBestScore = NegaMax(board, ref info, searchDepth, 0, -EvaluationConstants.ScoreInfinite, EvaluationConstants.ScoreInfinite);
-                if (SearchCompleted)
+                for (int searchDepth = 1; searchDepth < info.DepthLimit + 1; searchDepth++)
                 {
-                    RootBestMove = BestMove;
-                }
+                    TThit = 0;
+                    TTsucceed = 0;
+                    SearchNodesCounter = 0;
+                    QSearchNodesCounter = 0;
 
-                for (int i = 0; i < 1000; i++)
-                {
-                    if (TranspositionTable.entries[i].zobristHash != 0)
+                    int hashFullness = 0;
+
+                    RootBestScore = NegaMax(board, ref info, searchDepth, 0, -EvaluationConstants.ScoreInfinite, EvaluationConstants.ScoreInfinite);
+                    if (SearchCompleted)
                     {
-                        hashFullness++;
+                        RootBestMove = BestMove;
                     }
+
+                    for (int i = 0; i < 1000; i++)
+                    {
+                        if (TranspositionTable.entries[i].zobristHash != 0)
+                        {
+                            hashFullness++;
+                        }
+                    }
+
+                    long timeInMS = TimeManager.TotalSearchTime.ElapsedMilliseconds;
+                    int nps = (int)((NodesCounter / Math.Max(1, timeInMS)) * 1000);
+                    move = Utility.MoveToString(RootBestMove);
+
+                    if (info.TimeManager.CheckTime())
+                    {
+                        break;
+                    }
+
+                    Console.WriteLine($"info depth {searchDepth} time {timeInMS} score cp {RootBestScore} nodes {NodesCounter} nps {nps} hashfull {hashFullness} pv {move}");
                 }
-
-                long timeInMS = TimeManager.TotalSearchTime.ElapsedMilliseconds;
-                int nps = (int)((NodesCounter / Math.Max(1, timeInMS)) * 1000);
-                move = Utility.MoveToString(RootBestMove);
-
-                if (info.TimeManager.CheckTime())
-                {
-                    break;
-                }
-
-                Console.WriteLine($"info depth {searchDepth} time {timeInMS} score cp {RootBestScore} nodes {NodesCounter} nps {nps} hashfull {hashFullness} pv {move}");
+            }
+            catch (TimeoutException)
+            {
+                
             }
 
             TimeManager.TotalSearchTime.Reset();
@@ -90,12 +107,13 @@ namespace Tortoise.Core
                 }
             }
 
-            ulong TTIndex = board.zobristHash % (uint)TranspositionTable.entries.Length;
+            ulong TTIndex = board.zobristHash % (ulong)TranspositionTable.entries.Length;
             TTEntry entry = TranspositionTable.entries[TTIndex];
             if (ply != 0)
             {
                 if (entry.zobristHash == board.zobristHash)
                 {
+                    TThit++;
                     if (entry.depth >= depth)
                     {
                         var entryBound = entry.type & TranspositionTable.TT_BOUND_MASK;
@@ -103,6 +121,7 @@ namespace Tortoise.Core
                            ((entryBound == SearchConstants.NodeBoundUpper) && (entry.score <= alpha)) ||
                            ((entryBound == SearchConstants.NodeBoundLower) && (entry.score >= beta)))
                         {
+                            TTsucceed++;
                             return entry.score;
                         }
                     }
@@ -136,12 +155,18 @@ namespace Tortoise.Core
                     continue;
                 }
 
-                NodesCounter++;
+                SearchNodesCounter++;
                 legalMoves++;
 
                 RepetitionHistory.Push(tempBoard.zobristHash);
                 bestSoFar = Math.Max(bestSoFar, -NegaMax(tempBoard, ref info, depth - 1, ply + 1, -beta, -alpha));
                 RepetitionHistory.Pop();
+
+                if (info.TimeManager.CheckTime())
+                {
+                    SearchCompleted = false;
+                    throw new TimeoutException();
+                }
 
                 if (bestSoFar > alpha)
                 {
@@ -158,12 +183,6 @@ namespace Tortoise.Core
                 if (bestSoFar >= beta)
                 {
                     nodeBound = SearchConstants.NodeBoundLower;
-                    break;
-                }
-
-                if (info.TimeManager.CheckTime())
-                {
-                    SearchCompleted = false;
                     break;
                 }
             }
@@ -218,7 +237,7 @@ namespace Tortoise.Core
                         continue;
                     }
 
-                    Search.NodesCounter++;
+                    QSearchNodesCounter++;
 
 
                     bestSoFar = Math.Max(bestSoFar, -Quiesce(tempBoard, -beta, -alpha));
