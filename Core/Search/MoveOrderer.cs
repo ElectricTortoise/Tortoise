@@ -9,14 +9,21 @@ namespace Tortoise.Core
 {
     public static unsafe class MoveOrderer
     {
-        public static void OrderMoves(ref Board board, ref MoveList moveList)
+        public static void OrderMoves(ref Board board, ref MoveList moveList, ushort TTmove)
         {
             Span<ScoredMove> ScoredMoves = stackalloc ScoredMove[moveList.Length];
 
             for (int i = 0; i < moveList.Length; i++)
             {
-                ScoredMove scoredMove = new ScoredMove(ref board, moveList.Moves[i]);
-                ScoredMoves[i] = scoredMove;
+                if (moveList.Moves[i] == TTmove)
+                {
+                    ScoredMoves[i] = new ScoredMove(TTmove, 1000000);
+                }
+                else
+                {
+                    ScoredMove scoredMove = new ScoredMove(ref board, moveList.Moves[i]);
+                    ScoredMoves[i] = scoredMove;
+                }
             }
 
             ScoredMoves.Sort(new MoveSorter());

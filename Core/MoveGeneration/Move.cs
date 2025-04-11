@@ -33,6 +33,11 @@ namespace Tortoise.Core
         {
             return (ushort)((ushort)((int)this.flag << 12) | this.StartSquare << 6 | this.FinalSquare);
         }
+
+        public override string ToString()
+        {
+            return $"{Utility.MoveToString(this)}, {flag}";
+        }
     }
 
     public unsafe struct MoveList

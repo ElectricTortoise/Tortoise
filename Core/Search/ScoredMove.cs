@@ -14,6 +14,17 @@ namespace Tortoise.Core
         public int score;
         public Move move;
 
+        public ScoredMove(Move move, int score)
+        {
+            this.score = score;
+            this.move = move;
+        }
+
+        public ScoredMove(ushort move, int score)
+        {
+            this = new ScoredMove(new Move(move), score);
+        }
+
         public ScoredMove(ref Board board, Move move)
         {
             this.score = 0;
@@ -28,11 +39,6 @@ namespace Tortoise.Core
             {
                 this.score += 100;
             }
-
-            //if ((move.flag & MoveFlag.Castle) != 0)
-            //{
-            //    this.score += 50;
-            //}
         }
 
         public ScoredMove(ref Board board, ushort move)

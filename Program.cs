@@ -27,15 +27,24 @@ namespace Tortoise
             //board.LoadPosition("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1");
 
             //MoveGen.GenAllMoves(board, ref moveList);
-            //MoveOrderer.OrderMoves(ref board, ref moveList);
+            //for (int i = 0; i < moveList.Length; i++)
+            //{
+            //    Console.WriteLine($"{new Move(moveList.Moves[i])}, {moveList.Moves[i]}");
+            //}
+
+            //Console.WriteLine();
+            //Console.WriteLine();
+
+            //MoveOrderer.OrderMoves(ref board, ref moveList, 0);
+            //for (int i = 0; i < moveList.Length; i++)
+            //{
+            //    Console.WriteLine($"{new Move(moveList.Moves[i])}, {moveList.Moves[i]}");
+            //}
+
             //SearchInformation searchInformation = new SearchInformation(board, 5);
 
             //Search.StartSearch(board, ref searchInformation);
 
-            //for (int i = 0; i < moveList.Length; i++)
-            //{
-            //    Console.WriteLine($"{Utility.MoveToString(new Move(moveList.Moves[i]))}, {new Move(moveList.Moves[i]).flag}");
-            //}
 
             DoInputLoop();
         }

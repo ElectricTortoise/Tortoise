@@ -95,7 +95,7 @@ namespace Tortoise.Core
             SearchCompleted = true;
 
             int repeatedMoves = 0;
-            if (ply != 0) //implement twofold detection for post-root, threefold detection for pre-root and skip every other move (since I cannot play my opponent's moves)
+            if (ply != 0) //To-do: implement twofold detection for post-root, threefold detection for pre-root and skip every other move (since I cannot play my opponent's moves)
             {
                 foreach (ulong hash in RepetitionHistory)
                 {
@@ -137,7 +137,7 @@ namespace Tortoise.Core
             int legalMoves = 0;
             MoveList moveList = new MoveList();
             MoveGen.GenAllMoves(board, ref moveList);
-            MoveOrderer.OrderMoves(ref board, ref moveList);
+            MoveOrderer.OrderMoves(ref board, ref moveList, entry.move);
 
             Board tempBoard;
             ushort bestMove = SearchConstants.NullMove;
@@ -218,7 +218,7 @@ namespace Tortoise.Core
 
             MoveList moveList = new MoveList();
             MoveGen.GenAllMoves(board, ref moveList); // a bit of time is wasted generating non-capture moves
-            MoveOrderer.OrderMoves(ref board, ref moveList);
+            MoveOrderer.OrderMoves(ref board, ref moveList, SearchConstants.NullMove);
 
             Board tempBoard;
             ushort bestMove = SearchConstants.NullMove;
@@ -238,7 +238,6 @@ namespace Tortoise.Core
                     }
 
                     QSearchNodesCounter++;
-
 
                     bestSoFar = Math.Max(bestSoFar, -Quiesce(tempBoard, -beta, -alpha));
                     alpha = Math.Max(alpha, bestSoFar);
