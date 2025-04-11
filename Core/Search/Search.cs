@@ -17,6 +17,8 @@ namespace Tortoise.Core
 
         public static TranspositionTable TranspositionTable;
 
+        public static ButterflyHistory History;
+
         //for debugging
         public static int TThit;
         public static int TTsucceed;
@@ -33,6 +35,7 @@ namespace Tortoise.Core
         static Search()
         {
             RepetitionHistory = new Stack<ulong>();
+            History = new ButterflyHistory();
         }
 
         public static void StartSearch(Board board, ref SearchInformation info)
@@ -137,7 +140,7 @@ namespace Tortoise.Core
             int legalMoves = 0;
             MoveList moveList = new MoveList();
             MoveGen.GenAllMoves(board, ref moveList);
-            MoveOrderer.OrderMoves(ref board, ref moveList, entry.move);
+            MoveOrderer.OrderMoves(ref board, ref moveList, History.ButterflyTable, entry.move);
 
             Board tempBoard;
             ushort bestMove = SearchConstants.NullMove;
@@ -145,7 +148,7 @@ namespace Tortoise.Core
 
             for (int i = 0; i < moveList.Length; i++)
             {
-                ushort move = moveList.Moves[i];
+                Move move = new Move(moveList.Moves[i]);
                 tempBoard = board;
                 tempBoard.MakeMove(move); // flips whose turn it is to move
 
@@ -170,20 +173,29 @@ namespace Tortoise.Core
 
                 if (bestSoFar > alpha)
                 {
-                    bestMove = move;
+                    bestMove = move.EncodeMove();
                     alpha = bestSoFar;
                     nodeBound = SearchConstants.NodeBoundExact;
                     if (ply == 0 && bestSoFar >= alpha)
                     {
                         BestScore = bestSoFar;
-                        BestMove = move;
+                        BestMove = bestMove;
                     }
                 }
 
                 if (bestSoFar >= beta)
                 {
+                    if ((move.flag & MoveFlag.Capture) == 0)
+                    {
+                        History.Add(5, board.boardState.GetColourToMove(), move.StartSquare, move.FinalSquare);
+                    }
                     nodeBound = SearchConstants.NodeBoundLower;
                     break;
+                }
+
+                if ((move.flag & MoveFlag.Capture) == 0)
+                {
+                    History.Add(-5, board.boardState.GetColourToMove(), move.StartSquare, move.FinalSquare);
                 }
             }
 
@@ -218,15 +230,14 @@ namespace Tortoise.Core
 
             MoveList moveList = new MoveList();
             MoveGen.GenAllMoves(board, ref moveList); // a bit of time is wasted generating non-capture moves
-            MoveOrderer.OrderMoves(ref board, ref moveList, SearchConstants.NullMove);
+            MoveOrderer.OrderMoves(ref board, ref moveList, History.ButterflyTable, SearchConstants.NullMove);
 
             Board tempBoard;
-            ushort bestMove = SearchConstants.NullMove;
 
             for (int i = 0; i < moveList.Length; i++)
             {
-                ushort move = moveList.Moves[i];
-                if ((new Move(move).flag & MoveFlag.Capture) != 0)
+                Move move = new Move(moveList.Moves[i]);
+                if ((move.flag & MoveFlag.Capture) != 0)
                 {
                     tempBoard = board;
                     tempBoard.MakeMove(move); // flips whose turn it is to move
@@ -243,7 +254,6 @@ namespace Tortoise.Core
                     alpha = Math.Max(alpha, bestSoFar);
                     if (bestSoFar > alpha)
                     {
-                        bestMove = move;
                         alpha = bestSoFar;
                     }
                     if (bestSoFar >= beta)
