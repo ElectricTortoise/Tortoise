@@ -32,9 +32,6 @@ namespace Tortoise.Core
         public static int RootBestScore;
         public static ushort RootBestMove;
 
-        public static bool AspirationFailLow;
-        public static bool AspirationFailHigh;
-
         static Search()
         {
             RepetitionHistory = new Stack<ulong>();
@@ -56,32 +53,29 @@ namespace Tortoise.Core
                     TTsucceed = 0;
                     int hashFullness = 0;
 
-                    AspirationFailLow = false;
-                    AspirationFailHigh = false;
-                    bool SearchAspiration = searchDepth >= 5;
-                    int aspirationAlphaExpand = 0;
-                    int aspirationBetaExpand = 0;
-                    
-                    if (SearchAspiration)
-                    {
+                    int alpha = -EvaluationConstants.ScoreInfinite;
+                    int beta = EvaluationConstants.ScoreInfinite;
+                    int delta = SearchConstants.delta;
 
-                        int aspirationAlpha = BestScore - 50 - 5 ^ aspirationAlphaExpand;
-                        int aspirationBeta = BestScore + 50 + 5 ^ aspirationBetaExpand;
-                        BestScore = NegaMax(board, ref info, searchDepth, 0, aspirationAlpha, aspirationBeta);
-                        if (AspirationFailLow)
-                        {
-                            aspirationAlphaExpand++;
-                            searchDepth--;
-                        }
-                        if (AspirationFailHigh)
-                        {
-                            aspirationBetaExpand++;
-                            searchDepth--;
-                        }
-                    }
-                    else
+                    if (searchDepth >= 5)
                     {
-                        BestScore = NegaMax(board, ref info, searchDepth, 0, -EvaluationConstants.ScoreInfinite, EvaluationConstants.ScoreInfinite);
+                        alpha = Math.Max(BestScore - delta, -EvaluationConstants.ScoreInfinite);
+                        beta = Math.Min(BestScore + delta, EvaluationConstants.ScoreInfinite);
+                    }
+                    
+                    while (true)
+                    {
+                        BestScore = NegaMax(board, ref info, searchDepth, 0, alpha, beta);
+
+                        if (BestScore <= alpha || BestScore >= beta)
+                        {
+                            alpha = -EvaluationConstants.ScoreInfinite;
+                            beta = EvaluationConstants.ScoreInfinite;
+                        }
+                        else
+                        {
+                            break;
+                        }
                     }
                     
                     if (SearchCompleted)
@@ -124,11 +118,6 @@ namespace Tortoise.Core
         public static int NegaMax(Board board, ref SearchInformation info, int depth, int ply, int alpha, int beta)
         {
             SearchCompleted = true;
-
-            if (ply == 0)
-            {
-                AspirationFailLow = true;
-            }
 
             int repeatedMoves = 0;
             if (ply != 0) //To-do: implement twofold detection for post-root, threefold detection for pre-root and skip every other move (since I cannot play my opponent's moves)
@@ -224,16 +213,11 @@ namespace Tortoise.Core
                     {
                         BestScore = bestSoFar;
                         BestMove = bestMove;
-                        AspirationFailLow = false;
                     }
                 }
 
                 if (bestSoFar >= beta)
                 {
-                    if (ply == 0)
-                    {
-                        AspirationFailHigh = true;
-                    }
                     if ((move.flag & MoveFlag.Capture) == 0)
                     {
                         History.Add(5, board.boardState.GetColourToMove(), move.StartSquare, move.FinalSquare);

@@ -23,5 +23,7 @@ namespace Tortoise.Core
         public const byte NodeBoundLower = 0b01;
         public const byte NodeBoundUpper = 0b10;
         public const byte NodeBoundExact = 0b11;
+
+        public const int delta = 50;
     }
 }
