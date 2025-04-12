@@ -19,7 +19,7 @@ namespace Tortoise.Core
         }
 
 
-        public static void GenAllMoves(Board board, ref MoveList movelist)
+        public static void GenAllMoves(in Board board, ref MoveList movelist)
         {
             GenNonSliderMoves(board, PieceType.Knight, ref movelist);
             GenNonSliderMoves(board, PieceType.King, ref movelist);
@@ -30,7 +30,7 @@ namespace Tortoise.Core
             GenCastlingMoves(board, ref movelist);
         }
 
-        public static void GenNonSliderMoves(Board board, int pieceType, ref MoveList movelist)
+        public static void GenNonSliderMoves(in Board board, int pieceType, ref MoveList movelist)
         {
             ulong myColourBitboard = board.colourBitboard[board.boardState.GetColourToMove()];
             ulong myPieceBitboard = board.pieceBitboard[pieceType] & myColourBitboard;
@@ -61,7 +61,7 @@ namespace Tortoise.Core
             }
         }
 
-        public static void GenSliderMoves(Board board, int pieceType, ref MoveList movelist)
+        public static void GenSliderMoves(in Board board, int pieceType, ref MoveList movelist)
         {
             ulong allPieceBitboard = board.allPieceBitboard;
             ulong myColourBitboard = board.colourBitboard[board.boardState.GetColourToMove()];
@@ -96,7 +96,7 @@ namespace Tortoise.Core
             }
         }
 
-        public static void GenPawnMoves(Board board, ref MoveList movelist)
+        public static void GenPawnMoves(in Board board, ref MoveList movelist)
         {
             ulong allPieceBitboard = board.allPieceBitboard;
             ulong myColourBitboard = board.colourBitboard[board.boardState.GetColourToMove()];
@@ -197,7 +197,7 @@ namespace Tortoise.Core
             }
         }
 
-        public static void GenCastlingMoves(Board board, ref MoveList movelist)
+        public static void GenCastlingMoves(in Board board, ref MoveList movelist)
         {
             MoveFlag flag = MoveFlag.Castle;
 
@@ -216,7 +216,7 @@ namespace Tortoise.Core
             }
         }
 
-        private static bool IsCastlingValid(int startSquare, int targetSquare, Board board)
+        private static bool IsCastlingValid(int startSquare, int targetSquare, in Board board)
         {
             ulong allPieceBitboard = board.allPieceBitboard;
             int direction = targetSquare > startSquare ? 1 : -1;

@@ -67,7 +67,7 @@ namespace Tortoise.Core
             return isRook ? MoveGen.RookLookup[square][hash] : MoveGen.BishopLookup[square][hash]; ;
         }
 
-        public static bool IsInCheck(Board board, int kingSquare, int opponentColour)
+        public static bool IsInCheck(in Board board, int kingSquare, int opponentColour)
         {
             ulong opponentColourBitboard = board.colourBitboard[opponentColour];
             ulong allPieceBitboard = board.allPieceBitboard;

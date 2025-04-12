@@ -12,6 +12,11 @@ namespace Tortoise
     {
         public static void Main(string[] args)
         {
+            //Yoinked from Lizard and Lynx
+            //Console.ReadLine() has a buffer of 256 (UTF-16?) characters
+            //This allows Tortoise to read UCI strings which are longer than that
+            Console.SetIn(new StreamReader(Console.OpenStandardInput(), Encoding.UTF8, false, 4096 * 4));
+
             if (args.Length != 0)
             {
                 if (args[0] == "bench") 
@@ -20,30 +25,6 @@ namespace Tortoise
                     Environment.Exit(0);
                 }
             }
-
-            //Board board = new Board();
-            //MoveList moveList = new MoveList();
-
-            //board.LoadPosition("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1");
-
-            //MoveGen.GenAllMoves(board, ref moveList);
-            //for (int i = 0; i < moveList.Length; i++)
-            //{
-            //    Console.WriteLine($"{new Move(moveList.Moves[i])}, {moveList.Moves[i]}");
-            //}
-
-            //Console.WriteLine();
-            //Console.WriteLine();
-
-            //MoveOrderer.OrderMoves(ref board, ref moveList, 0);
-            //for (int i = 0; i < moveList.Length; i++)
-            //{
-            //    Console.WriteLine($"{new Move(moveList.Moves[i])}, {moveList.Moves[i]}");
-            //}
-
-            //SearchInformation searchInformation = new SearchInformation(board, 5);
-
-            //Search.StartSearch(board, ref searchInformation);
 
             DoInputLoop();
         }
