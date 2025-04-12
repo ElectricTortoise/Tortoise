@@ -20,5 +20,11 @@ namespace Tortoise.Core
         {
             this.ButterflyTable[colour, startSquare, targetSquare] += score;
         }
+
+        public void Clear()
+        {
+            Array.Clear(this.ButterflyTable);
+        }
+
     }
 }

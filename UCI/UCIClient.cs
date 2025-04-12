@@ -78,6 +78,7 @@ namespace Tortoise.UCI
                 {
                     Search.RepetitionHistory.Clear(); 
                     Search.TranspositionTable.Clear();
+                    Search.History.Clear();
                 }
                 else if (cmd == "isready")
                 {
