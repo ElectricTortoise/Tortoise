@@ -9,7 +9,7 @@ namespace Tortoise.Core
 {
     public static unsafe class MoveOrderer
     {
-        public static void OrderMoves(ref Board board, ref MoveList moveList, ushort TTmove)
+        public static void OrderMoves(ref Board board, ref MoveList moveList, int[,,] HistoryTable, ushort TTmove)
         {
             Span<ScoredMove> ScoredMoves = stackalloc ScoredMove[moveList.Length];
 
@@ -22,6 +22,10 @@ namespace Tortoise.Core
                 else
                 {
                     ScoredMove scoredMove = new ScoredMove(ref board, moveList.Moves[i]);
+                    if ((scoredMove.move.flag & MoveFlag.Capture) == 0)
+                    {
+                        scoredMove.score += HistoryTable[board.boardState.GetColourToMove(), scoredMove.move.StartSquare, scoredMove.move.FinalSquare];
+                    } 
                     ScoredMoves[i] = scoredMove;
                 }
             }

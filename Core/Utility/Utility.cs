@@ -11,11 +11,13 @@ namespace Tortoise.Core
 {
     public static class Utility
     {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int GetSquareIndex(string square)
         {
             return ((square[0] - 'a') + (('8' - square[1]) * 8));
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string GetSquareName(int square)
         {
             return (((char)(square % 8 + 'a')).ToString() + ((char)('8' - square / 8)).ToString());
