@@ -51,15 +51,37 @@ namespace Tortoise.Core
                 {
                     TThit = 0;
                     TTsucceed = 0;
-                    SearchNodesCounter = 0;
-                    QSearchNodesCounter = 0;
-
                     int hashFullness = 0;
 
-                    RootBestScore = NegaMax(board, ref info, searchDepth, 0, -EvaluationConstants.ScoreInfinite, EvaluationConstants.ScoreInfinite);
+                    int alpha = -EvaluationConstants.ScoreInfinite;
+                    int beta = EvaluationConstants.ScoreInfinite;
+                    int delta = SearchConstants.delta;
+
+                    if (searchDepth >= 5)
+                    {
+                        alpha = Math.Max(BestScore - delta, -EvaluationConstants.ScoreInfinite);
+                        beta = Math.Min(BestScore + delta, EvaluationConstants.ScoreInfinite);
+                    }
+                    
+                    while (true)
+                    {
+                        BestScore = NegaMax(board, ref info, searchDepth, 0, alpha, beta);
+
+                        if (BestScore <= alpha || BestScore >= beta)
+                        {
+                            alpha = -EvaluationConstants.ScoreInfinite;
+                            beta = EvaluationConstants.ScoreInfinite;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    
                     if (SearchCompleted)
                     {
                         RootBestMove = BestMove;
+                        RootBestScore = BestScore;
                     }
 
                     for (int i = 0; i < 1000; i++)
@@ -187,7 +209,7 @@ namespace Tortoise.Core
                     bestMove = move.EncodeMove();
                     alpha = bestSoFar;
                     nodeBound = SearchConstants.NodeBoundExact;
-                    if (ply == 0 && bestSoFar >= alpha)
+                    if (ply == 0)
                     {
                         BestScore = bestSoFar;
                         BestMove = bestMove;
