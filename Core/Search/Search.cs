@@ -55,7 +55,7 @@ namespace Tortoise.Core
 
                     int alpha = -EvaluationConstants.ScoreInfinite;
                     int beta = EvaluationConstants.ScoreInfinite;
-                    int delta = SearchConstants.delta;
+                    int delta = SearchConstants.DefaultAspirationWindow;
 
                     if (searchDepth >= 5)
                     {
@@ -67,15 +67,20 @@ namespace Tortoise.Core
                     {
                         BestScore = NegaMax(board, ref info, searchDepth, 0, alpha, beta);
 
-                        if (BestScore <= alpha || BestScore >= beta)
+                        if (BestScore <= alpha)
                         {
-                            alpha = -EvaluationConstants.ScoreInfinite;
-                            beta = EvaluationConstants.ScoreInfinite;
+                            alpha -= delta;
+                        }
+                        else if (BestScore >= beta)
+                        {
+                            beta += delta;
                         }
                         else
                         {
                             break;
                         }
+
+                        delta += delta;
                     }
                     
                     if (SearchCompleted)
