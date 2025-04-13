@@ -25,7 +25,7 @@ namespace Tortoise.Core
 
         public override string ToString()
         {
-            string typeName = type switch
+            string typeName = (type & TranspositionTable.TT_BOUND_MASK) switch
             {
                 SearchConstants.NodeBoundNone => "N",
                 SearchConstants.NodeBoundLower => "L",

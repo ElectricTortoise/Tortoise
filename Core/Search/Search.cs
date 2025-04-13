@@ -122,8 +122,17 @@ namespace Tortoise.Core
 
         public static int NegaMax(Board board, ref SearchInformation info, int depth, int ply, int alpha, int beta)
         {
+            //initialize some values
             SearchCompleted = true;
+            byte nodeType = SearchConstants.NodeTypeNull;
+            bool isPV = false;
+            if (beta - alpha > 1)
+            {
+                isPV = true;
+                nodeType |= SearchConstants.NodePV;
+            }
 
+            //threefold
             int repeatedMoves = 0;
             if (ply != 0) //To-do: implement twofold detection for post-root, threefold detection for pre-root and skip every other move (since I cannot play my opponent's moves)
             {
@@ -137,6 +146,7 @@ namespace Tortoise.Core
                 }
             }
 
+            //TT cutoff
             ulong TTIndex = board.zobristHash % (ulong)TranspositionTable.entries.Length;
             TTEntry entry = TranspositionTable.entries[TTIndex];
             if (ply != 0)
@@ -158,21 +168,35 @@ namespace Tortoise.Core
                 }
             }
 
+            //QS
             if (depth <= 0)
             {
                 return Quiesce(board, alpha, beta);
             }
 
+            //RFP
+            if (depth <= 3 && !isPV && !MoveGenUtility.IsInCheck(board, board.kingSquares[board.boardState.GetColourToMove()], board.boardState.GetOpponentColour()))
+            {
+                int staticEval = Evaluation.Evaluate(board);
+                if ((staticEval- depth * SearchConstants.RFPMargin) >= beta)
+                {
+                    return staticEval;
+                }
+            }
+
+            //generate moves
             int bestSoFar = -EvaluationConstants.ScoreInfinite;
             int legalMoves = 0;
             MoveList moveList = new MoveList();
             MoveGen.GenAllMoves(board, ref moveList);
             MoveOrderer.OrderMoves(ref board, ref moveList, History.ButterflyTable, entry.move);
 
+            //initialise remaining variables
             Board tempBoard;
             ushort bestMove = SearchConstants.NullMove;
             byte nodeBound = SearchConstants.NodeBoundUpper;
 
+            //moveloop
             for (int i = 0; i < moveList.Length; i++)
             {
                 Move move = new Move(moveList.Moves[i]);
@@ -237,6 +261,7 @@ namespace Tortoise.Core
                 }
             }
 
+            //legality check
             if (legalMoves == 0)
             {
                 int kingSquare = board.kingSquares[board.boardState.GetColourToMove()];
@@ -250,7 +275,9 @@ namespace Tortoise.Core
                 }
             }
 
-            TranspositionTable.Add(board.zobristHash, new TTEntry(board.zobristHash, bestMove, (short)bestSoFar, (byte)depth, nodeBound));
+            nodeType |= nodeBound;
+
+            TranspositionTable.Add(board.zobristHash, new TTEntry(board.zobristHash, bestMove, (short)bestSoFar, (byte)depth, nodeType));
 
             return bestSoFar;
         }
