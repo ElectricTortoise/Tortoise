@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.Metrics;
 using System.IO.IsolatedStorage;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -25,33 +26,42 @@ namespace Tortoise.Core
         public static int SearchNodesCounter;
         public static int QSearchNodesCounter;
         public static int NodesCounter => SearchNodesCounter + QSearchNodesCounter;
+        public static int AlphaRaises;
+        public static int BetaCutoffs;
 
         private static bool SearchCompleted;
         private static int BestScore;
         private static ushort BestMove;
         public static int RootBestScore;
         public static ushort RootBestMove;
+        public static ushort[,] PVMoves;
 
         static Search()
         {
             RepetitionHistory = new Stack<ulong>();
             History = new ButterflyHistory();
+            PVMoves = new ushort[256, 256];
         }
 
         public static void StartSearch(Board board, ref SearchInformation info)
         {
-            string move = "";
             info.SearchActive = true;
             RootBestScore = 0;
 
             TimeManager.TotalSearchTime.Start();
             try
             {
+                TThit = 0;
+                TTsucceed = 0;
+                AlphaRaises = 0;
+                BetaCutoffs = 0;
+                SearchNodesCounter = 0;
+                QSearchNodesCounter = 0;
                 for (int searchDepth = 1; searchDepth < info.DepthLimit + 1; searchDepth++)
                 {
-                    TThit = 0;
-                    TTsucceed = 0;
+                    Array.Clear(PVMoves);
                     int hashFullness = 0;
+                    string move = "";
 
                     int alpha = -EvaluationConstants.ScoreInfinite;
                     int beta = EvaluationConstants.ScoreInfinite;
@@ -62,7 +72,7 @@ namespace Tortoise.Core
                         alpha = Math.Max(BestScore - delta, -EvaluationConstants.ScoreInfinite);
                         beta = Math.Min(BestScore + delta, EvaluationConstants.ScoreInfinite);
                     }
-                    
+
                     while (true)
                     {
                         BestScore = NegaMax(board, ref info, searchDepth, 0, alpha, beta);
@@ -82,7 +92,7 @@ namespace Tortoise.Core
 
                         delta += delta;
                     }
-                    
+
                     if (SearchCompleted)
                     {
                         RootBestMove = BestMove;
@@ -99,11 +109,10 @@ namespace Tortoise.Core
 
                     long timeInMS = TimeManager.TotalSearchTime.ElapsedMilliseconds;
                     int nps = (int)((NodesCounter / Math.Max(1, timeInMS)) * 1000);
-                    move = Utility.MoveToString(RootBestMove);
 
-                    if (info.TimeManager.CheckTime())
+                    for (int i = 0; i <= searchDepth - 1; i++)
                     {
-                        break;
+                        move += ($"{Utility.MoveToString(PVMoves[0, i])} ");
                     }
 
                     Console.WriteLine($"info depth {searchDepth} time {timeInMS} score cp {RootBestScore} nodes {NodesCounter} nps {nps} hashfull {hashFullness} pv {move}");
@@ -111,12 +120,12 @@ namespace Tortoise.Core
             }
             catch (TimeoutException)
             {
-                
+
             }
 
             TimeManager.TotalSearchTime.Reset();
 
-            Console.WriteLine($"bestmove {move}");
+            Console.WriteLine($"bestmove {Utility.MoveToString(RootBestMove)}");
             info.SearchActive = false;
         }
 
@@ -125,12 +134,7 @@ namespace Tortoise.Core
             //initialize some values
             SearchCompleted = true;
             byte nodeType = SearchConstants.NodeTypeNull;
-            bool isPV = false;
-            if (beta - alpha > 1)
-            {
-                isPV = true;
-                nodeType |= SearchConstants.NodePV;
-            }
+            bool isPV = (beta - alpha > 1);
 
             //threefold
             int repeatedMoves = 0;
@@ -149,7 +153,7 @@ namespace Tortoise.Core
             //TT cutoff
             ulong TTIndex = board.zobristHash % (ulong)TranspositionTable.entries.Length;
             TTEntry entry = TranspositionTable.entries[TTIndex];
-            if (ply != 0)
+            if (ply != 0 && !isPV)
             {
                 if (entry.zobristHash == board.zobristHash)
                 {
@@ -178,7 +182,7 @@ namespace Tortoise.Core
             if (depth <= 3 && !isPV && !MoveGenUtility.IsInCheck(board, board.kingSquares[board.boardState.GetColourToMove()], board.boardState.GetOpponentColour()))
             {
                 int staticEval = Evaluation.Evaluate(board);
-                if ((staticEval- depth * SearchConstants.RFPMargin) >= beta)
+                if ((staticEval - depth * SearchConstants.RFPMargin) >= beta)
                 {
                     return staticEval;
                 }
@@ -219,7 +223,7 @@ namespace Tortoise.Core
                 }
                 else
                 {
-                    bestSoFar = Math.Max(bestSoFar, -NegaMax(tempBoard, ref info, depth - 1, ply + 1, -alpha-1, -alpha)); //zws
+                    bestSoFar = Math.Max(bestSoFar, -NegaMax(tempBoard, ref info, depth - 1, ply + 1, -alpha - 1, -alpha)); //zws
                     if (alpha < bestSoFar && bestSoFar < beta)
                     {
                         bestSoFar = Math.Max(bestSoFar, -NegaMax(tempBoard, ref info, depth - 1, ply + 1, -beta, -alpha)); //full window search if zws fails-high
@@ -235,6 +239,7 @@ namespace Tortoise.Core
 
                 if (bestSoFar > alpha)
                 {
+                    AlphaRaises++;
                     bestMove = move.EncodeMove();
                     alpha = bestSoFar;
                     nodeBound = SearchConstants.NodeBoundExact;
@@ -243,10 +248,26 @@ namespace Tortoise.Core
                         BestScore = bestSoFar;
                         BestMove = bestMove;
                     }
+                    if (isPV)
+                    {
+                        for (int j = 0; j < 256; j++)
+                        {
+                            ushort pv = PVMoves[ply + 1, j];
+
+                            if (pv == SearchConstants.NullMove)
+                            {
+                                PVMoves[ply, j + 1] = pv;
+                                break;
+                            }
+                            PVMoves[ply, j + 1] = pv;
+                        }
+                        PVMoves[ply, 0] = bestMove;
+                    }
                 }
 
                 if (bestSoFar >= beta)
                 {
+                    BetaCutoffs++;
                     if ((move.flag & MoveFlag.Capture) == 0)
                     {
                         History.Add(5, board.boardState.GetColourToMove(), move.StartSquare, move.FinalSquare);
@@ -326,7 +347,7 @@ namespace Tortoise.Core
                         return bestSoFar;
                     }
                 }
-                else 
+                else
                 {
                     return bestSoFar;
                 }
@@ -334,6 +355,20 @@ namespace Tortoise.Core
 
             return bestSoFar;
         }
+    
+
+        private static void PrintPVTable(int searchDepth)
+        {
+            for (int i = 0; i <= searchDepth - 1; i++)
+            {
+                for (int j = 0; j <= searchDepth - 1; j++)
+                {
+                    Console.Write($"{Utility.MoveToString(PVMoves[i, j])} ");
+                }
+                Console.WriteLine();
+            }
+            Console.WriteLine();
+            Console.WriteLine();
+        }
     }
 }
-

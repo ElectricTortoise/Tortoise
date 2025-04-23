@@ -34,17 +34,17 @@ namespace Tortoise.Core
         {
             string startSquare = GetSquareName(move.StartSquare);
             string finalSquare = GetSquareName(move.FinalSquare);
-            char flag = move.flag switch
+            string flag = move.flag switch
             {
-                MoveFlag.PromoteToKnight => 'n',
-                MoveFlag.PromoteToKnight | MoveFlag.Capture => 'n',
-                MoveFlag.PromoteToBishop => 'b',
-                MoveFlag.PromoteToBishop | MoveFlag.Capture => 'b',
-                MoveFlag.PromoteToRook => 'r',
-                MoveFlag.PromoteToRook | MoveFlag.Capture => 'r',
-                MoveFlag.PromoteToQueen => 'q',
-                MoveFlag.PromoteToQueen | MoveFlag.Capture => 'q',
-                _ => ' '
+                MoveFlag.PromoteToKnight => "n",
+                MoveFlag.PromoteToKnight | MoveFlag.Capture => "n",
+                MoveFlag.PromoteToBishop => "b",
+                MoveFlag.PromoteToBishop | MoveFlag.Capture => "b",
+                MoveFlag.PromoteToRook => "r",
+                MoveFlag.PromoteToRook | MoveFlag.Capture => "r",
+                MoveFlag.PromoteToQueen => "q",
+                MoveFlag.PromoteToQueen | MoveFlag.Capture => "q",
+                _ => ""
             };
 
             return $"{startSquare}{finalSquare}{flag}";
@@ -53,7 +53,14 @@ namespace Tortoise.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string MoveToString(ushort move)
         {
-            return MoveToString(new Move(move));
+            if (move == SearchConstants.NullMove) 
+            {
+                return "Null";
+            }
+            else
+            {
+                return MoveToString(new Move(move));
+            }
         }
     }
 }

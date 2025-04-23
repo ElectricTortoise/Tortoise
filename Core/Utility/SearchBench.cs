@@ -46,7 +46,7 @@ namespace Tortoise.Core
             {
                 TThitrate = (float)Search.TThit / Search.SearchNodesCounter;
             }
-            Console.Write($"TThit {Search.TThit} \nTTread {Search.SearchNodesCounter} \nTTsucceed {Search.TTsucceed} \nTThitrate {TThitrate} \n");
+            Console.Write($"TThit {Search.TThit} \nTTread {Search.SearchNodesCounter} \nTTsucceed {Search.TTsucceed} \nTThitrate {TThitrate} \nAlpha Raises {Search.AlphaRaises} \nBeta Cutoffs {Search.BetaCutoffs} \n");
         }
 
         private static string[] BenchFENs = new string[]
