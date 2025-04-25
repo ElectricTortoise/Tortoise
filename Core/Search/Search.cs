@@ -217,18 +217,20 @@ namespace Tortoise.Core
                 legalMoves++;
 
                 RepetitionHistory.Push(tempBoard.zobristHash);
+                int childScore;
                 if (i == 0)
                 {
-                    bestSoFar = Math.Max(bestSoFar, -NegaMax(tempBoard, ref info, depth - 1, ply + 1, -beta, -alpha));
+                    childScore = -NegaMax(tempBoard, ref info, depth - 1, ply + 1, -beta, -alpha);
                 }
                 else
                 {
-                    bestSoFar = Math.Max(bestSoFar, -NegaMax(tempBoard, ref info, depth - 1, ply + 1, -alpha - 1, -alpha)); //zws
-                    if (alpha < bestSoFar && bestSoFar < beta)
+                    childScore = -NegaMax(tempBoard, ref info, depth - 1, ply + 1, -alpha - 1, -alpha); //zws
+                    if (alpha < childScore && childScore < beta)
                     {
-                        bestSoFar = Math.Max(bestSoFar, -NegaMax(tempBoard, ref info, depth - 1, ply + 1, -beta, -alpha)); //full window search if zws fails-high
+                        childScore = -NegaMax(tempBoard, ref info, depth - 1, ply + 1, -beta, -alpha); //full window search if zws fails-high
                     }
                 }
+                bestSoFar = Math.Max(childScore, bestSoFar);
                 RepetitionHistory.Pop();
 
                 if (info.TimeManager.CheckTime())
